@@ -132,16 +132,12 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy", builder =>
     {
-        builder.WithOrigins("http://localhost:5173").WithOrigins("http://localhost:5174")
+        builder.WithOrigins("http://localhost:5173", "http://localhost:5174")
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials();
     });
 });
-
-// builder.Services.AddControllers().AddJsonOptions(options =>
-//     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles
-// );
 
 builder.Services.AddControllersWithViews()
     .AddNewtonsoftJson(options =>

@@ -158,3 +158,4 @@ D:\Projects\ChuyenDeThucTap\Server\obj\Debug\net8.0\refint\Server.dll
 D:\Projects\ChuyenDeThucTap\Server\obj\Debug\net8.0\Server.pdb
 D:\Projects\ChuyenDeThucTap\Server\obj\Debug\net8.0\Server.genruntimeconfig.cache
 D:\Projects\ChuyenDeThucTap\Server\obj\Debug\net8.0\ref\Server.dll
+D:\Projects\ChuyenDeThucTap\Server\obj\Debug\net8.0\Server.sourcelink.json
