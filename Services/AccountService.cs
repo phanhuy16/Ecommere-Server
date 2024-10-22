@@ -118,6 +118,7 @@ public class AccountService : IAccount
         return new ResponseDto
         {
             Token = token,
+            Id = user.Id,
             IsSuccess = true,
             Message = "Login Success.",
             HttpStatusCode = HttpStatusCode.OK,
