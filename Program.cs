@@ -11,7 +11,6 @@ using Server.Helper;
 using Server.Data;
 using Server.Entities;
 using Server.Utilities.Pagination;
-using System.Text.Json.Serialization;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -28,6 +27,7 @@ builder.Services.AddScoped<IReport, ReportService>();
 builder.Services.AddScoped<IAccount, AccountService>();
 builder.Services.AddScoped<IRole, RoleService>();
 builder.Services.AddScoped<ISupplier, SupplierService>();
+builder.Services.AddScoped<ICustomer, CustomerService>();
 builder.Services.Configure<ApplicationSettings>(builder.Configuration.GetSection("HRConnectString"));
 builder.Services.AddScoped(typeof(ApplicationSettings));
 

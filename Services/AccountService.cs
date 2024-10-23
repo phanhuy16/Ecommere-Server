@@ -67,7 +67,7 @@ public class AccountService : IAccount
 
         if (registerDto.Roles == null)
         {
-            await _userManager.AddToRoleAsync(user, "User");
+            await _userManager.AddToRoleAsync(user, "Admin");
         }
         else
         {
