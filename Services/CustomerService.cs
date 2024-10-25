@@ -3,29 +3,36 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using MailKit.Net.Smtp;
+using MailKit.Security;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using MimeKit;
 using Server.Contracts;
 using Server.Dtos;
 using Server.Entities;
+using Server.Helper;
 
 namespace Server.Services;
 
 public class CustomerService : ICustomer
 {
     private readonly UserManager<User> _userManager;
-    private readonly RoleManager<IdentityRole> _roleManager;
     private readonly IConfiguration _configuration;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly MailSettings _mailSettings;
 
-    public CustomerService(UserManager<User> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
+    public CustomerService(UserManager<User> userManager, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, IOptions<MailSettings> mailSettings)
     {
         _userManager = userManager;
-        _roleManager = roleManager;
         _configuration = configuration;
         _httpContextAccessor = httpContextAccessor;
+        _mailSettings = mailSettings.Value;
+
     }
+
 
     public async Task<ActionResult> RegisterCustomer(Customers customer)
     {
@@ -82,11 +89,93 @@ public class CustomerService : ICustomer
 
         return new OkObjectResult(new ResponseDto
         {
-            Token = token,
             Id = user.Id,
+            Token = token,
             IsSuccess = true,
             Message = "Register Successfully.",
         });
+
+
+        // var sendMail = new MailRequest
+        // {
+        //     ToEmail = user.Email,
+        //     Subject = "Confirm your email",
+        //     Body = $"Please confirm your account by clicking this link: <br> <h3>{code}</h3>"
+        // };
+
+        // await SendEmailAsync(sendMail);
+
+    }
+
+    public async Task SendEmailAsync(MailRequest mailRequest)
+    {
+        var email = new MimeMessage();
+
+        email.Sender = MailboxAddress.Parse(_mailSettings.Mail);
+
+        email.To.Add(MailboxAddress.Parse(mailRequest.ToEmail));
+
+        email.Subject = mailRequest.Subject;
+
+        var builder = new BodyBuilder();
+        if (mailRequest.Attachments != null)
+        {
+            byte[] fileBytes;
+            foreach (var file in mailRequest.Attachments)
+            {
+                if (file.Length > 0)
+                {
+                    using (var ms = new MemoryStream())
+                    {
+                        file.CopyTo(ms);
+                        fileBytes = ms.ToArray();
+                    }
+                    builder.Attachments.Add(file.FileName, fileBytes, ContentType.Parse(file.ContentType));
+                }
+            }
+        }
+
+        builder.HtmlBody = mailRequest.Body;
+
+        email.Body = builder.ToMessageBody();
+
+        using var smtp = new SmtpClient();
+
+        smtp.Connect(_mailSettings.Host, _mailSettings.Port, SecureSocketOptions.StartTls);
+
+        smtp.Authenticate(_mailSettings.Mail, _mailSettings.Password);
+
+        await smtp.SendAsync(email);
+
+        smtp.Disconnect(true);
+    }
+
+    public async Task<IActionResult> EmailVerification(string? id, string? code)
+    {
+        if (id == null || code == null)
+        {
+            return new BadRequestObjectResult("Invalid payload");
+        }
+
+        var user = await _userManager.FindByIdAsync(id);
+
+        if (user == null)
+        {
+            return new BadRequestObjectResult("Invalid payload");
+        }
+
+        var isVerified = await _userManager.ConfirmEmailAsync(user, code);
+
+        if (isVerified.Succeeded)
+        {
+            return new OkObjectResult(new ResponseDto
+            {
+                IsSuccess = true,
+                Message = "Email confirmed",
+            });
+        }
+
+        return new BadRequestObjectResult("Something went wrong");
     }
 
     private string GenerateToken(User user)

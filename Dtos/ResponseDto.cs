@@ -1,4 +1,5 @@
 using System.Net;
+using Server.Entities;
 
 namespace Server.Dtos;
 

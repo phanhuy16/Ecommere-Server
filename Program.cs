@@ -28,7 +28,11 @@ builder.Services.AddScoped<IAccount, AccountService>();
 builder.Services.AddScoped<IRole, RoleService>();
 builder.Services.AddScoped<ISupplier, SupplierService>();
 builder.Services.AddScoped<ICustomer, CustomerService>();
+
+// Helper
 builder.Services.Configure<ApplicationSettings>(builder.Configuration.GetSection("HRConnectString"));
+builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
+
 builder.Services.AddScoped(typeof(ApplicationSettings));
 
 // Configure DbContext with connection string
@@ -46,6 +50,9 @@ builder.Services.AddIdentity<User, IdentityRole>()
 builder.Services.AddIdentityCore<User>(options =>
 {
     options.SignIn.RequireConfirmedAccount = true;
+
+    options.SignIn.RequireConfirmedEmail = true;
+
     options.Password.RequireDigit = true;
     options.Password.RequireNonAlphanumeric = true;
     options.Password.RequireUppercase = true;
@@ -61,7 +68,11 @@ builder.Services.AddIdentityCore<User>(options =>
     // User settings.
     options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
     options.User.RequireUniqueEmail = true;
-}).AddEntityFrameworkStores<EFDataContext>();
+
+    // Email confirmation
+    options.Tokens.EmailConfirmationTokenProvider = TokenOptions.DefaultEmailProvider;
+
+}).AddEntityFrameworkStores<EFDataContext>().AddDefaultTokenProviders();
 
 builder.Services.AddAuthentication(options =>
 {

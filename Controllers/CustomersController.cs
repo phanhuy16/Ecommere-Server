@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Server.Contracts;
 using Server.Dtos;
+using Server.Entities;
 
 namespace Server.Controllers
 {
@@ -16,6 +17,7 @@ namespace Server.Controllers
         {
             _customerService = customerService;
         }
+
         [AllowAnonymous]
         [HttpPost]
         [Route("sign-up")]
@@ -35,5 +37,34 @@ namespace Server.Controllers
 
             return Ok(response);
         }
+
+        // [AllowAnonymous]
+        // [HttpPost("send")]
+        // [ProducesResponseType(typeof(ResponseDto), (int)HttpStatusCode.OK)]
+        // public async Task<IActionResult> SendMail([FromForm] MailRequest request)
+        // {
+        //     try
+        //     {
+        //         await _customerService.SendEmailAsync(request);
+        //         return Ok();
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         throw;
+        //     }
+
+        // }
+        // [AllowAnonymous]
+        // [HttpPost]
+        // [Route("verification")]
+        // [Consumes("application/json")]
+        // [ProducesResponseType(typeof(ResponseDto), (int)HttpStatusCode.OK)]
+        // public async Task<ActionResult> EmailVerification([FromQuery] string? id, [FromBody] string? code)
+        // {
+
+        //     var response = await _customerService.EmailVerification(id, code);
+
+        //     return Ok(response);
+        // }
     }
 }

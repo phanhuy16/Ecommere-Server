@@ -159,3 +159,6 @@ D:\Projects\ChuyenDeThucTap\Server\obj\Debug\net8.0\Server.pdb
 D:\Projects\ChuyenDeThucTap\Server\obj\Debug\net8.0\Server.genruntimeconfig.cache
 D:\Projects\ChuyenDeThucTap\Server\obj\Debug\net8.0\ref\Server.dll
 D:\Projects\ChuyenDeThucTap\Server\obj\Debug\net8.0\Server.sourcelink.json
+D:\Projects\ChuyenDeThucTap\Server\bin\Debug\net8.0\BouncyCastle.Cryptography.dll
+D:\Projects\ChuyenDeThucTap\Server\bin\Debug\net8.0\MailKit.dll
+D:\Projects\ChuyenDeThucTap\Server\bin\Debug\net8.0\MimeKit.dll
