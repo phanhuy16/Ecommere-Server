@@ -1,6 +1,7 @@
 
 
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Security.Claims;
 using System.Text;
 using MailKit.Net.Smtp;
@@ -106,6 +107,45 @@ public class CustomerService : ICustomer
         // await SendEmailAsync(sendMail);
 
     }
+
+    public async Task<ActionResult<ResponseDto>> Login(LoginDto login)
+    {
+        var user = await _userManager.FindByEmailAsync(login.Email);
+
+        if (user == null)
+        {
+            return new ResponseDto
+            {
+                IsSuccess = false,
+                Message = "User not found with this email",
+                HttpStatusCode = HttpStatusCode.BadRequest,
+            };
+        }
+
+        var result = await _userManager.CheckPasswordAsync(user, login.Password);
+
+        if (!result)
+        {
+            return new ResponseDto
+            {
+                IsSuccess = false,
+                Message = "Invalid Password.",
+                HttpStatusCode = HttpStatusCode.BadRequest,
+            };
+        }
+
+        var token = GenerateToken(user);
+
+        return new ResponseDto
+        {
+            Token = token,
+            Id = user.Id,
+            IsSuccess = true,
+            Message = "Login Success.",
+            HttpStatusCode = HttpStatusCode.OK,
+        };
+    }
+
 
     public async Task SendEmailAsync(MailRequest mailRequest)
     {

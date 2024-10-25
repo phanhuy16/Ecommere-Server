@@ -38,6 +38,19 @@ namespace Server.Controllers
             return Ok(response);
         }
 
+        [AllowAnonymous]
+        [HttpPost]
+        [Route("login")]
+        [ProducesResponseType(typeof(ResponseDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ResponseDto), (int)HttpStatusCode.Unauthorized)]
+        public async Task<ActionResult<ResponseDto>> Login(LoginDto login)
+        {
+            var response = await _customerService.Login(login);
+
+            return Ok(response);
+
+        }
+
         // [AllowAnonymous]
         // [HttpPost("send")]
         // [ProducesResponseType(typeof(ResponseDto), (int)HttpStatusCode.OK)]

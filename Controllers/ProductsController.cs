@@ -10,7 +10,6 @@ using Server.Utilities.Response;
 
 namespace Server.Controllers;
 
-[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class ProductsController : ControllerBase
@@ -65,6 +64,7 @@ public class ProductsController : ControllerBase
         return Ok(response);
     }
 
+    [Authorize]
     [HttpPost, Route("add-new")]
     [ProducesResponseType(typeof(Response<Product>), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(Response<Product>), (int)HttpStatusCode.BadRequest)]
@@ -74,6 +74,7 @@ public class ProductsController : ControllerBase
         return Ok(response);
     }
 
+    [Authorize]
     [HttpPost, Route("add-sub-product")]
     [ProducesResponseType(typeof(List<Response<SubProduct>>), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(Response<SubProduct>), (int)HttpStatusCode.BadRequest)]
@@ -83,6 +84,7 @@ public class ProductsController : ControllerBase
         return Ok(response);
     }
 
+    [Authorize]
     [HttpPut, Route("update/{id}")]
     [ProducesResponseType(typeof(List<Response<Product>>), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(Response<Product>), (int)HttpStatusCode.BadRequest)]
@@ -92,7 +94,7 @@ public class ProductsController : ControllerBase
         return Ok(response);
     }
 
-
+    [Authorize]
     [HttpPut, Route("update-sub-product")]
     [ProducesResponseType(typeof(List<Response<SubProduct>>), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(Response<SubProduct>), (int)HttpStatusCode.BadRequest)]
@@ -102,6 +104,7 @@ public class ProductsController : ControllerBase
         return Ok(response);
     }
 
+    [Authorize]
     [HttpDelete, Route("delete/{ProductId}")]
     [ProducesResponseType(typeof(Response<Product>), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(Response<Product>), (int)HttpStatusCode.BadRequest)]
@@ -110,6 +113,8 @@ public class ProductsController : ControllerBase
         var response = await _productService.Delete(ProductId);
         return Ok(response);
     }
+
+    [Authorize]
     [HttpDelete, Route("delete-sub-product")]
     [ProducesResponseType(typeof(Response<SubProduct>), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(Response<SubProduct>), (int)HttpStatusCode.BadRequest)]

@@ -7,7 +7,6 @@ D:\Projects\ChuyenDeThucTap\Server\obj\Debug\net8.0\Server.MvcApplicationPartsAs
 D:\Projects\ChuyenDeThucTap\Server\obj\Debug\net8.0\Server.MvcApplicationPartsAssemblyInfo.cache
 D:\Projects\ChuyenDeThucTap\Server\bin\Debug\net8.0\appsettings.Development.json
 D:\Projects\ChuyenDeThucTap\Server\bin\Debug\net8.0\appsettings.json
-D:\Projects\ChuyenDeThucTap\Server\bin\Debug\net8.0\Properties copy\launchSettings.json
 D:\Projects\ChuyenDeThucTap\Server\bin\Debug\net8.0\Server.exe
 D:\Projects\ChuyenDeThucTap\Server\bin\Debug\net8.0\Server.deps.json
 D:\Projects\ChuyenDeThucTap\Server\bin\Debug\net8.0\Server.runtimeconfig.json

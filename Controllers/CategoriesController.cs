@@ -9,7 +9,6 @@ using Server.Utilities.Response;
 
 namespace Server.Controllers;
 
-[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class CategoriesController : ControllerBase
@@ -46,6 +45,7 @@ public class CategoriesController : ControllerBase
         return Ok(response);
     }
 
+    [Authorize]
     [HttpPost]
     [Route("add-new")]
     [ProducesResponseType(typeof(Response<Category>), (int)HttpStatusCode.OK)]
@@ -68,6 +68,7 @@ public class CategoriesController : ControllerBase
         return BadRequest(response);
     }
 
+    [Authorize]
     [HttpDelete]
     [Route("delete/{id}")]
     [ProducesResponseType(typeof(Response<Category>), (int)HttpStatusCode.OK)]
@@ -81,6 +82,7 @@ public class CategoriesController : ControllerBase
         return BadRequest(response);
     }
 
+    [Authorize]
     [HttpPut, Route("update/{id}")]
     [ProducesResponseType(typeof(List<Response<Category>>), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(Response<Category>), (int)HttpStatusCode.BadRequest)]
