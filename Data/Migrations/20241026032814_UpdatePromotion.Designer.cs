@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Server.Data;
 
@@ -11,9 +12,11 @@ using Server.Data;
 namespace Server.Data.Migrations
 {
     [DbContext(typeof(EFDataContext))]
-    partial class EFDataContextModelSnapshot : ModelSnapshot
+    [Migration("20241026032814_UpdatePromotion")]
+    partial class UpdatePromotion
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -51,13 +54,13 @@ namespace Server.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "b4cedf44-5911-4322-8a45-32dc746297b3",
+                            Id = "f3f6252e-4b23-4294-bc30-8adbc8350ba8",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
-                            Id = "25722b87-43a0-4d9b-b42a-7d025715e83b",
+                            Id = "839fcca4-aae1-47ac-9e28-dc48078f4461",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         });
@@ -376,9 +379,6 @@ namespace Server.Data.Migrations
                     b.Property<string>("ImageURL")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("NumOfAvailable")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("StartAt")
                         .HasColumnType("datetime2");
 
@@ -448,9 +448,6 @@ namespace Server.Data.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("Discount")
-                        .HasColumnType("int");
 
                     b.Property<string>("Images")
                         .HasColumnType("nvarchar(max)");

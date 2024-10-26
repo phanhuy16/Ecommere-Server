@@ -28,6 +28,7 @@ builder.Services.AddScoped<IAccount, AccountService>();
 builder.Services.AddScoped<IRole, RoleService>();
 builder.Services.AddScoped<ISupplier, SupplierService>();
 builder.Services.AddScoped<ICustomer, CustomerService>();
+builder.Services.AddScoped<IPromotion, PromotionService>();
 
 // Helper
 builder.Services.Configure<ApplicationSettings>(builder.Configuration.GetSection("HRConnectString"));

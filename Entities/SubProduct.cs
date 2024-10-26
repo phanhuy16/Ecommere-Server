@@ -9,6 +9,7 @@ public class SubProduct
     public decimal Price { get; set; }
     public string Color { get; set; } = string.Empty;
     public int Qty { get; set; } = 0;
+    public int Discount { get; set; }
     public string[]? Images { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }

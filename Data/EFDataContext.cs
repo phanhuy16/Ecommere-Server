@@ -18,6 +18,7 @@ public partial class EFDataContext : IdentityDbContext<User>
     public DbSet<OrderItem> OrderItems { get; set; }
     public DbSet<Report> Reports { get; set; }
     public DbSet<Supplier> Suppliers { get; set; }
+    public DbSet<Promotion> Promotions { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         foreach (var property in modelBuilder.Model.GetEntityTypes()
@@ -46,6 +47,13 @@ public partial class EFDataContext : IdentityDbContext<User>
                 .WithMany(p => p.SubProducts)
                 .HasForeignKey(sp => sp.Product_Id)
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // Cấu hình cho Promotion
+        modelBuilder.Entity<Promotion>(entity =>
+        {
+            entity.HasKey(p => p.Id).HasName("PK_promotion_id");
+            entity.ToTable("Promotion");
         });
 
         // Cấu hình cho ProductCategory

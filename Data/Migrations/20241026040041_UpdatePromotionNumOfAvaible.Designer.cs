@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Server.Data;
 
@@ -11,9 +12,11 @@ using Server.Data;
 namespace Server.Data.Migrations
 {
     [DbContext(typeof(EFDataContext))]
-    partial class EFDataContextModelSnapshot : ModelSnapshot
+    [Migration("20241026040041_UpdatePromotionNumOfAvaible")]
+    partial class UpdatePromotionNumOfAvaible
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -51,13 +54,13 @@ namespace Server.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "b4cedf44-5911-4322-8a45-32dc746297b3",
+                            Id = "e6b9a602-20da-4993-aab5-e9419209e8b5",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
-                            Id = "25722b87-43a0-4d9b-b42a-7d025715e83b",
+                            Id = "469335db-997a-4237-b286-14b0118866f7",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         });
@@ -448,9 +451,6 @@ namespace Server.Data.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("Discount")
-                        .HasColumnType("int");
 
                     b.Property<string>("Images")
                         .HasColumnType("nvarchar(max)");

@@ -47,6 +47,7 @@ public class ProductService : IProduct
                 Color = sub.Color,
                 Images = sub.Images,
                 Qty = sub.Qty,
+                Discount = sub.Discount,
                 Product_Id = sub.Product_Id,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
@@ -267,6 +268,7 @@ public class ProductService : IProduct
             subProduct.Price = sub.Price;
             subProduct.Color = sub.Color;
             subProduct.Qty = sub.Qty;
+            subProduct.Discount = sub.Discount;
             subProduct.Images = sub.Images;
 
             _context.SubProducts.Update(subProduct);
@@ -426,6 +428,7 @@ public class ProductService : IProduct
                             Color = sp.Color,
                             Images = sp.Images,
                             Qty = sp.Qty,
+                            Discount = sp.Discount,
                             Product_Id = sp.Product_Id,
                             CreatedAt = sp.CreatedAt,
                             UpdatedAt = sp.UpdatedAt,
@@ -481,6 +484,7 @@ public class ProductService : IProduct
                             Color = sp.Color,
                             Images = sp.Images,
                             Qty = sp.Qty,
+                            Discount = sp.Discount,
                             Product_Id = sp.Product_Id,
                             CreatedAt = sp.CreatedAt,
                             UpdatedAt = sp.UpdatedAt,
@@ -538,6 +542,7 @@ public class ProductService : IProduct
                                         Color = sp.Color,
                                         Images = sp.Images,
                                         Qty = sp.Qty,
+                                        Discount = sp.Discount,
                                         Product_Id = sp.Product_Id,
                                         CreatedAt = sp.CreatedAt,
                                         UpdatedAt = sp.UpdatedAt,
