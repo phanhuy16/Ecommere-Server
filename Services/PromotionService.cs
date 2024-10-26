@@ -80,11 +80,10 @@ public class PromotionService : IPromotion
             .OrderByDescending(x => x.Id)
             .ToListAsync();
 
-            var query = promotion.ToList<Promotion>();
 
             return new Response<List<Promotion>>
             {
-                Data = query,
+                Data = promotion,
                 IsSuccess = true,
                 Message = "Get all promotion successfully.",
                 HttpStatusCode = HttpStatusCode.OK,
@@ -93,6 +92,108 @@ public class PromotionService : IPromotion
         catch (Exception ex)
         {
             throw new Exception(ex.Message.ToString());
+        }
+    }
+
+    public async Task<Response<Promotion>> UpdatePromotion(Promotion promo, Guid Id)
+    {
+        try
+        {
+            if (Id <= Guid.Empty)
+            {
+                return new Response<Promotion>
+                {
+                    IsSuccess = false,
+                    Message = "Id Not Found",
+                    HttpStatusCode = HttpStatusCode.BadRequest,
+                };
+            }
+
+            var promotion = await _context.Promotions.FirstOrDefaultAsync(x => x.Id == Id);
+            if (promotion == null)
+            {
+                return new Response<Promotion>
+                {
+                    IsSuccess = false,
+                    Message = "Promotion Not Found",
+                    HttpStatusCode = HttpStatusCode.BadRequest,
+                };
+            }
+
+            // Update properties
+            promotion.Id = promo.Id;
+            promotion.Title = promo.Title;
+            promotion.Description = promo.Description;
+            promotion.Code = promo.Code;
+            promotion.Value = promo.Value;
+            promotion.NumOfAvailable = promo.NumOfAvailable;
+            promotion.Type = promotion.Type;
+            promotion.ImageURL = promo.ImageURL;
+            promotion.StartAt = promo.StartAt;
+            promotion.EndAt = promo.EndAt;
+
+            _context.Promotions.Update(promotion);
+            await _context.SaveChangesAsync();
+
+            return new Response<Promotion>
+            {
+                Data = promotion,
+                IsSuccess = true,
+                Message = "Update successfully promotion",
+                HttpStatusCode = HttpStatusCode.OK,
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Response<Promotion>
+            {
+                IsSuccess = false,
+                Message = "Server Error",
+                HttpStatusCode = HttpStatusCode.InternalServerError,
+            };
+        }
+    }
+
+    public async Task<Response<Promotion>> DeletePromotion(Guid Id)
+    {
+        try
+        {
+            if (Id <= Guid.Empty)
+            {
+                return new Response<Promotion>
+                {
+                    IsSuccess = false,
+                    Message = "Id Not Found",
+                    HttpStatusCode = HttpStatusCode.BadRequest,
+                };
+            }
+            var promotion = _context.Promotions.Where(x => x.Id == Id).FirstOrDefault();
+            if (promotion == null)
+            {
+                return new Response<Promotion>
+                {
+                    IsSuccess = false,
+                    Message = "Promotion Not Found",
+                    HttpStatusCode = HttpStatusCode.BadRequest,
+                };
+            }
+            _context.Promotions.Remove(promotion);
+            await _context.SaveChangesAsync();
+            return new Response<Promotion>
+            {
+                IsSuccess = true,
+                Message = "Delete successfully promotion",
+                HttpStatusCode = HttpStatusCode.OK,
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Response<Promotion>
+            {
+                IsSuccess = false,
+                Message = "Server Error",
+                HttpStatusCode = HttpStatusCode.BadRequest,
+            };
         }
     }
 }

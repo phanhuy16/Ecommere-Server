@@ -37,4 +37,24 @@ public class PromotionController : ControllerBase
 
         return Ok(response);
     }
+
+    [Authorize]
+    [HttpPut, Route("update")]
+    [ProducesResponseType(typeof(List<Response<Promotion>>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(Response<Promotion>), (int)HttpStatusCode.BadRequest)]
+    public async Task<ActionResult> UpdatePromotion([FromQuery] Promotion promotion, Guid id)
+    {
+        var response = await _promotionService.UpdatePromotion(promotion, id);
+        return Ok(response);
+    }
+
+    [Authorize]
+    [HttpDelete, Route("delete")]
+    [ProducesResponseType(typeof(Response<Product>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(Response<Product>), (int)HttpStatusCode.BadRequest)]
+    public async Task<ActionResult> DeletePromotion([FromQuery] Guid id)
+    {
+        var response = await _promotionService.DeletePromotion(id);
+        return Ok(response);
+    }
 }
