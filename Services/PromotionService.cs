@@ -1,5 +1,6 @@
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Server.Contracts;
 using Server.Data;
 using Server.Entities;
@@ -54,6 +55,44 @@ public class PromotionService : IPromotion
                 Message = "Error server",
                 HttpStatusCode = HttpStatusCode.BadRequest,
             };
+        }
+    }
+
+
+    public async Task<Response<List<Promotion>>> GetAllPromotion()
+    {
+        try
+        {
+            var promotion = await _context.Promotions
+            .Select(promo => new Promotion
+            {
+                Id = promo.Id,
+                Title = promo.Title,
+                Description = promo.Description,
+                Code = promo.Code,
+                Value = promo.Value,
+                NumOfAvailable = promo.NumOfAvailable,
+                Type = promo.Type,
+                ImageURL = promo.ImageURL,
+                StartAt = promo.StartAt,
+                EndAt = promo.EndAt,
+            })
+            .OrderByDescending(x => x.Id)
+            .ToListAsync();
+
+            var query = promotion.ToList<Promotion>();
+
+            return new Response<List<Promotion>>
+            {
+                Data = query,
+                IsSuccess = true,
+                Message = "Get all promotion successfully.",
+                HttpStatusCode = HttpStatusCode.OK,
+            };
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message.ToString());
         }
     }
 }

@@ -19,13 +19,22 @@ public class PromotionController : ControllerBase
         _promotionService = promotionService;
     }
 
-    // [Authorize]
+    [Authorize]
     [HttpPost, Route("add-new")]
     [ProducesResponseType(typeof(Response<Promotion>), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(Response<Promotion>), (int)HttpStatusCode.BadRequest)]
     public async Task<ActionResult> AddPromotion([FromBody] Promotion promotion)
     {
         var response = await _promotionService.AddPromotion(promotion);
+        return Ok(response);
+    }
+
+    [HttpGet, Route("get-all")]
+    [ProducesResponseType(typeof(List<Promotion>), (int)HttpStatusCode.OK)]
+    public async Task<ActionResult> GetAllPromotion()
+    {
+        var response = await _promotionService.GetAllPromotion();
+
         return Ok(response);
     }
 }

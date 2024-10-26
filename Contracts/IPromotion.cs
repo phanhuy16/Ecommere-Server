@@ -6,4 +6,5 @@ namespace Server.Contracts;
 public interface IPromotion
 {
     Task<Response<Promotion>> AddPromotion(Promotion promo);
+    Task<Response<List<Promotion>>> GetAllPromotion();
 }
