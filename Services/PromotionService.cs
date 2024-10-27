@@ -121,7 +121,6 @@ public class PromotionService : IPromotion
             }
 
             // Update properties
-            promotion.Id = promo.Id;
             promotion.Title = promo.Title;
             promotion.Description = promo.Description;
             promotion.Code = promo.Code;
@@ -148,7 +147,7 @@ public class PromotionService : IPromotion
             return new Response<Promotion>
             {
                 IsSuccess = false,
-                Message = "Server Error",
+                Message = ex.Message.ToString(),
                 HttpStatusCode = HttpStatusCode.InternalServerError,
             };
         }
@@ -191,7 +190,7 @@ public class PromotionService : IPromotion
             return new Response<Promotion>
             {
                 IsSuccess = false,
-                Message = "Server Error",
+                Message = ex.Message.ToString(),
                 HttpStatusCode = HttpStatusCode.BadRequest,
             };
         }

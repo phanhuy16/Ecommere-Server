@@ -42,7 +42,7 @@ public class PromotionController : ControllerBase
     [HttpPut, Route("update")]
     [ProducesResponseType(typeof(List<Response<Promotion>>), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(Response<Promotion>), (int)HttpStatusCode.BadRequest)]
-    public async Task<ActionResult> UpdatePromotion([FromQuery] Promotion promotion, Guid id)
+    public async Task<ActionResult> UpdatePromotion([FromBody] Promotion promotion, [FromQuery] Guid id)
     {
         var response = await _promotionService.UpdatePromotion(promotion, id);
         return Ok(response);
