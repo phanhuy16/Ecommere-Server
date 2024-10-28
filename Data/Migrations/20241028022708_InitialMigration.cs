@@ -33,6 +33,8 @@ namespace Server.Data.Migrations
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     FullName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FisrtName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -74,6 +76,26 @@ namespace Server.Data.Migrations
                         principalTable: "Categories",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Promotion",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Value = table.Column<int>(type: "int", nullable: false),
+                    NumOfAvailable = table.Column<int>(type: "int", nullable: false),
+                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    StartAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ImageURL = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_promotion_id", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -262,12 +284,9 @@ namespace Server.Data.Migrations
                 columns: table => new
                 {
                     Order_Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Cart_Id = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    Order_Date = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Order_Decs = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Order_Fee = table.Column<decimal>(type: "decimal(18,6)", nullable: false),
-                    Created_At = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Updated_At = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    CreateBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Total = table.Column<int>(type: "int", nullable: false),
+                    Cart_Id = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -276,8 +295,7 @@ namespace Server.Data.Migrations
                         name: "FK_orders_carts_Cart_Id",
                         column: x => x.Cart_Id,
                         principalTable: "carts",
-                        principalColumn: "Cart_Id",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "Cart_Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -305,36 +323,6 @@ namespace Server.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "reports",
-                columns: table => new
-                {
-                    Report_Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Inventory_Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Product_Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    User_Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    QuantityOnHand = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Created_At = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Updated_At = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_reports", x => x.Report_Id);
-                    table.ForeignKey(
-                        name: "FK_reports_AspNetUsers_User_Id",
-                        column: x => x.User_Id,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_reports_Products_ProductId",
-                        column: x => x.ProductId,
-                        principalTable: "Products",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "SubProducts",
                 columns: table => new
                 {
@@ -343,10 +331,12 @@ namespace Server.Data.Migrations
                     Price = table.Column<decimal>(type: "decimal(18,6)", nullable: false),
                     Color = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Qty = table.Column<int>(type: "int", nullable: false),
+                    Discount = table.Column<int>(type: "int", nullable: false),
                     Images = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Product_Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    Product_Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Order_Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -357,42 +347,12 @@ namespace Server.Data.Migrations
                         principalTable: "Products",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "order_items",
-                columns: table => new
-                {
-                    Order_Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Product_Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Inventory_Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Report_Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Ordered_Quantity = table.Column<byte>(type: "tinyint", nullable: false),
-                    Created_At = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Updated_At = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_order_items", x => new { x.Product_Id, x.Order_Id });
                     table.ForeignKey(
-                        name: "FK_order_items_Products_ProductId",
-                        column: x => x.ProductId,
-                        principalTable: "Products",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_order_items_orders_Product_Id",
-                        column: x => x.Product_Id,
+                        name: "FK_SubProducts_orders_Order_Id",
+                        column: x => x.Order_Id,
                         principalTable: "orders",
                         principalColumn: "Order_Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_order_items_reports_Report_Id",
-                        column: x => x.Report_Id,
-                        principalTable: "reports",
-                        principalColumn: "Report_Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.InsertData(
@@ -400,8 +360,8 @@ namespace Server.Data.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "1fdcc1f7-47cc-4c5b-85ca-6279a2d01dd1", null, "User", "USER" },
-                    { "f2b7960c-d54b-40cd-b9ac-494849116304", null, "Admin", "ADMIN" }
+                    { "74df34ed-5c4c-47f1-a180-1fbfaeaaed93", null, "Admin", "ADMIN" },
+                    { "b6365bb8-6721-4c7c-8dda-93874577cbce", null, "User", "USER" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -455,16 +415,6 @@ namespace Server.Data.Migrations
                 column: "ParentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_order_items_ProductId",
-                table: "order_items",
-                column: "ProductId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_order_items_Report_Id",
-                table: "order_items",
-                column: "Report_Id");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_orders_Cart_Id",
                 table: "orders",
                 column: "Cart_Id");
@@ -480,14 +430,9 @@ namespace Server.Data.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_reports_ProductId",
-                table: "reports",
-                column: "ProductId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_reports_User_Id",
-                table: "reports",
-                column: "User_Id");
+                name: "IX_SubProducts_Order_Id",
+                table: "SubProducts",
+                column: "Order_Id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_SubProducts_Product_Id",
@@ -519,10 +464,10 @@ namespace Server.Data.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "order_items");
+                name: "ProductCategories");
 
             migrationBuilder.DropTable(
-                name: "ProductCategories");
+                name: "Promotion");
 
             migrationBuilder.DropTable(
                 name: "SubProducts");
@@ -534,19 +479,16 @@ namespace Server.Data.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "orders");
+                name: "Products");
 
             migrationBuilder.DropTable(
-                name: "reports");
+                name: "orders");
 
             migrationBuilder.DropTable(
                 name: "Categories");
 
             migrationBuilder.DropTable(
                 name: "carts");
-
-            migrationBuilder.DropTable(
-                name: "Products");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

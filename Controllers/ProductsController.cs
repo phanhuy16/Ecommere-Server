@@ -38,6 +38,15 @@ public class ProductsController : ControllerBase
         return Ok(response);
     }
 
+    [HttpGet, Route("get-best-seller")]
+    [ProducesResponseType(typeof(List<Product>), (int)HttpStatusCode.OK)]
+    public async Task<ActionResult> GetBestSellerProducts()
+    {
+        var response = await _productService.GetBestSellerProducts();
+
+        return Ok(response);
+    }
+
     [HttpGet, Route("get-pagination")]
     [ProducesResponseType(typeof(List<IEnumerable<Product>>), (int)HttpStatusCode.OK)]
     public async Task<ActionResult> GetPaginationProducts([FromQuery] PaginationFilter filter)

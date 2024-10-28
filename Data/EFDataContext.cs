@@ -15,8 +15,6 @@ public partial class EFDataContext : IdentityDbContext<User>
     public DbSet<ProductCategory> ProductCategories { get; set; }
     public DbSet<Cart> Carts { get; set; }
     public DbSet<Order> Orders { get; set; }
-    public DbSet<OrderItem> OrderItems { get; set; }
-    public DbSet<Report> Reports { get; set; }
     public DbSet<Supplier> Suppliers { get; set; }
     public DbSet<Promotion> Promotions { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -46,6 +44,11 @@ public partial class EFDataContext : IdentityDbContext<User>
             entity.HasOne(sp => sp.Product)
                 .WithMany(p => p.SubProducts)
                 .HasForeignKey(sp => sp.Product_Id)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(sp => sp.Order)
+                .WithMany(o => o.SubProducts)
+                .HasForeignKey(p => p.Order_Id)
                 .OnDelete(DeleteBehavior.Cascade);
         });
 
@@ -126,10 +129,6 @@ public partial class EFDataContext : IdentityDbContext<User>
                 .HasForeignKey<Cart>(c => c.User_Id)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            entity.HasMany(c => c.Orders)
-                .WithOne(c => c.Cart)
-                .HasForeignKey(c => c.Order_Id)
-                .OnDelete(DeleteBehavior.Restrict);
         });
 
         //Order
@@ -137,61 +136,12 @@ public partial class EFDataContext : IdentityDbContext<User>
             {
                 entity.ToTable("orders");
                 entity.HasKey(s => s.Order_Id);
-
-                entity.HasOne(o => o.Cart)
-                    .WithMany(o => o.Orders)
-                    .HasForeignKey(o => o.Cart_Id)
-                    .OnDelete(DeleteBehavior.Restrict);
-
-                entity.HasMany(o => o.OrderItems)
-                    .WithOne(o => o.Order)
-                    .HasForeignKey(o => o.Order_Id)
-                    .OnDelete(DeleteBehavior.Restrict);
             });
-
-        // OrderItem
-        modelBuilder.Entity<OrderItem>(entity =>
-        {
-            entity.ToTable("order_items");
-            entity.HasKey(s => new { s.Product_Id, s.Order_Id });
-
-            entity.HasOne(o => o.Order)
-                .WithMany(o => o.OrderItems)
-                .HasForeignKey(o => o.Product_Id)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            entity.HasOne(o => o.Report)
-                .WithMany(o => o.OrderItems)
-                .HasForeignKey(o => o.Report_Id)
-                .OnDelete(DeleteBehavior.Restrict);
-        });
-
-        // Report
-        modelBuilder.Entity<Report>(entity =>
-        {
-            entity.ToTable("reports");
-            entity.HasKey(r => new { r.Report_Id });
-
-            entity.HasOne(r => r.User)
-                .WithMany(r => r.Reports)
-                .HasForeignKey(r => r.User_Id)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            entity.HasMany(r => r.OrderItems)
-                .WithOne(r => r.Report)
-                .HasForeignKey(r => r.Report_Id)
-                .OnDelete(DeleteBehavior.Restrict);
-        });
 
         //User 
         modelBuilder.Entity<User>(entity =>
         {
             entity.ToTable("users");
-
-            entity.HasMany(u => u.Reports)
-                .WithOne(u => u.User)
-                .HasForeignKey(u => u.User_Id)
-                .OnDelete(DeleteBehavior.Restrict);
         });
 
         // Cấu hình cho Supplier

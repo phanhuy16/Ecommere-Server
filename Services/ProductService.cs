@@ -445,6 +445,60 @@ public class ProductService : IProduct
         }
     }
 
+    public async Task<List<Product>> GetBestSellerProducts()
+    {
+        try
+        {
+            var products = await _context.Products
+                    .Include(p => p.ProductCategories)
+                    .Include(p => p.SubProducts)
+                    .Select(pro => new Product
+                    {
+                        Id = pro.Id,
+                        Title = pro.Title,
+                        Slug = pro.Slug,
+                        Supplier = pro.Supplier,
+                        Content = pro.Content,
+                        Description = pro.Description,
+                        Images = pro.Images,
+                        ExpiryDate = pro.ExpiryDate,
+                        CreatedAt = pro.CreatedAt,
+                        UpdatedAt = pro.UpdatedAt,
+                        ProductCategories = pro.ProductCategories.Select(pc => new ProductCategory
+                        {
+                            CategoryId = pc.CategoryId,
+                            Category = new Category
+                            {
+                                Id = pc.Category.Id,
+                                Title = pc.Category.Title,
+                            }
+                        }).ToList(),
+                        SubProducts = pro.SubProducts.Select(sp => new SubProduct
+                        {
+                            Id = sp.Id,
+                            Size = sp.Size,
+                            Price = sp.Price,
+                            Color = sp.Color,
+                            Images = sp.Images,
+                            Qty = sp.Qty,
+                            Discount = sp.Discount,
+                            Product_Id = sp.Product_Id,
+                            CreatedAt = sp.CreatedAt,
+                            UpdatedAt = sp.UpdatedAt,
+                        }).ToList()
+                    })
+                    .OrderByDescending(x => x.Id)
+                    .Take(8)
+                    .ToListAsync();
+
+            return products;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.ToString());
+        }
+    }
+
     public async Task<IActionResult> GetPaginationProducts(PaginationFilter filter, string route)
     {
         try

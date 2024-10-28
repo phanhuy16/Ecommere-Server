@@ -22,8 +22,6 @@ builder.Services.AddScoped<ICategory, CategoryService>();
 builder.Services.AddScoped<IProduct, ProductService>();
 builder.Services.AddScoped<ICart, CartService>();
 builder.Services.AddScoped<IOrder, OrderService>();
-builder.Services.AddScoped<IOrderItem, OrderItemService>();
-builder.Services.AddScoped<IReport, ReportService>();
 builder.Services.AddScoped<IAccount, AccountService>();
 builder.Services.AddScoped<IRole, RoleService>();
 builder.Services.AddScoped<ISupplier, SupplierService>();

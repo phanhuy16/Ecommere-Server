@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -7,7 +8,7 @@
 namespace Server.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class UpdateSubProductDiscount : Migration
+    public partial class UpdateSubProduct : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -15,27 +16,28 @@ namespace Server.Data.Migrations
             migrationBuilder.DeleteData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
-                keyValue: "469335db-997a-4237-b286-14b0118866f7");
+                keyValue: "74df34ed-5c4c-47f1-a180-1fbfaeaaed93");
 
             migrationBuilder.DeleteData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
-                keyValue: "e6b9a602-20da-4993-aab5-e9419209e8b5");
+                keyValue: "b6365bb8-6721-4c7c-8dda-93874577cbce");
 
-            migrationBuilder.AddColumn<int>(
-                name: "Discount",
+            migrationBuilder.AlterColumn<Guid>(
+                name: "Order_Id",
                 table: "SubProducts",
-                type: "int",
-                nullable: false,
-                defaultValue: 0);
+                type: "uniqueidentifier",
+                nullable: true,
+                oldClrType: typeof(Guid),
+                oldType: "uniqueidentifier");
 
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "25722b87-43a0-4d9b-b42a-7d025715e83b", null, "Admin", "ADMIN" },
-                    { "b4cedf44-5911-4322-8a45-32dc746297b3", null, "User", "USER" }
+                    { "87575734-2d07-4d82-95dd-67036bcb8fcc", null, "User", "USER" },
+                    { "a6a00681-09a0-4a63-bee3-90d450b5601e", null, "Admin", "ADMIN" }
                 });
         }
 
@@ -45,24 +47,30 @@ namespace Server.Data.Migrations
             migrationBuilder.DeleteData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
-                keyValue: "25722b87-43a0-4d9b-b42a-7d025715e83b");
+                keyValue: "87575734-2d07-4d82-95dd-67036bcb8fcc");
 
             migrationBuilder.DeleteData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
-                keyValue: "b4cedf44-5911-4322-8a45-32dc746297b3");
+                keyValue: "a6a00681-09a0-4a63-bee3-90d450b5601e");
 
-            migrationBuilder.DropColumn(
-                name: "Discount",
-                table: "SubProducts");
+            migrationBuilder.AlterColumn<Guid>(
+                name: "Order_Id",
+                table: "SubProducts",
+                type: "uniqueidentifier",
+                nullable: false,
+                defaultValue: new Guid("00000000-0000-0000-0000-000000000000"),
+                oldClrType: typeof(Guid),
+                oldType: "uniqueidentifier",
+                oldNullable: true);
 
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "469335db-997a-4237-b286-14b0118866f7", null, "Admin", "ADMIN" },
-                    { "e6b9a602-20da-4993-aab5-e9419209e8b5", null, "User", "USER" }
+                    { "74df34ed-5c4c-47f1-a180-1fbfaeaaed93", null, "Admin", "ADMIN" },
+                    { "b6365bb8-6721-4c7c-8dda-93874577cbce", null, "User", "USER" }
                 });
         }
     }

@@ -51,13 +51,13 @@ namespace Server.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "b4cedf44-5911-4322-8a45-32dc746297b3",
+                            Id = "87575734-2d07-4d82-95dd-67036bcb8fcc",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
-                            Id = "25722b87-43a0-4d9b-b42a-7d025715e83b",
+                            Id = "a6a00681-09a0-4a63-bee3-90d450b5601e",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         });
@@ -235,62 +235,18 @@ namespace Server.Data.Migrations
                     b.Property<Guid?>("Cart_Id")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("Created_At")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("Order_Date")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Order_Decs")
+                    b.Property<string>("CreateBy")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("Order_Fee")
-                        .HasColumnType("decimal(18,6)");
-
-                    b.Property<DateTime>("Updated_At")
-                        .HasColumnType("datetime2");
+                    b.Property<int>("Total")
+                        .HasColumnType("int");
 
                     b.HasKey("Order_Id");
 
                     b.HasIndex("Cart_Id");
 
                     b.ToTable("orders", (string)null);
-                });
-
-            modelBuilder.Entity("Server.Entities.OrderItem", b =>
-                {
-                    b.Property<Guid>("Product_Id")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("Order_Id")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("Created_At")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("Inventory_Id")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<byte>("Ordered_Quantity")
-                        .HasColumnType("tinyint");
-
-                    b.Property<Guid>("ProductId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("Report_Id")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("Updated_At")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Product_Id", "Order_Id");
-
-                    b.HasIndex("ProductId");
-
-                    b.HasIndex("Report_Id");
-
-                    b.ToTable("order_items", (string)null);
                 });
 
             modelBuilder.Entity("Server.Entities.Product", b =>
@@ -399,43 +355,6 @@ namespace Server.Data.Migrations
                     b.ToTable("Promotion", (string)null);
                 });
 
-            modelBuilder.Entity("Server.Entities.Report", b =>
-                {
-                    b.Property<Guid>("Report_Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("Created_At")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("Inventory_Id")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("ProductId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("Product_Id")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("QuantityOnHand")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("Updated_At")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("User_Id")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Report_Id");
-
-                    b.HasIndex("ProductId");
-
-                    b.HasIndex("User_Id");
-
-                    b.ToTable("reports", (string)null);
-                });
-
             modelBuilder.Entity("Server.Entities.SubProduct", b =>
                 {
                     b.Property<Guid>("Id")
@@ -455,6 +374,9 @@ namespace Server.Data.Migrations
                     b.Property<string>("Images")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid?>("Order_Id")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,6)");
 
@@ -473,6 +395,8 @@ namespace Server.Data.Migrations
 
                     b.HasKey("Id")
                         .HasName("PK_subproducts_id");
+
+                    b.HasIndex("Order_Id");
 
                     b.HasIndex("Product_Id");
 
@@ -681,39 +605,9 @@ namespace Server.Data.Migrations
 
             modelBuilder.Entity("Server.Entities.Order", b =>
                 {
-                    b.HasOne("Server.Entities.Cart", "Cart")
+                    b.HasOne("Server.Entities.Cart", null)
                         .WithMany("Orders")
-                        .HasForeignKey("Cart_Id")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Cart");
-                });
-
-            modelBuilder.Entity("Server.Entities.OrderItem", b =>
-                {
-                    b.HasOne("Server.Entities.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Server.Entities.Order", "Order")
-                        .WithMany("OrderItems")
-                        .HasForeignKey("Product_Id")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Server.Entities.Report", "Report")
-                        .WithMany("OrderItems")
-                        .HasForeignKey("Report_Id")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Order");
-
-                    b.Navigation("Product");
-
-                    b.Navigation("Report");
+                        .HasForeignKey("Cart_Id");
                 });
 
             modelBuilder.Entity("Server.Entities.Product", b =>
@@ -742,32 +636,20 @@ namespace Server.Data.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("Server.Entities.Report", b =>
-                {
-                    b.HasOne("Server.Entities.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Server.Entities.User", "User")
-                        .WithMany("Reports")
-                        .HasForeignKey("User_Id")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Product");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Server.Entities.SubProduct", b =>
                 {
+                    b.HasOne("Server.Entities.Order", "Order")
+                        .WithMany("SubProducts")
+                        .HasForeignKey("Order_Id")
+                        .OnDelete(DeleteBehavior.Cascade);
+
                     b.HasOne("Server.Entities.Product", "Product")
                         .WithMany("SubProducts")
                         .HasForeignKey("Product_Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Order");
 
                     b.Navigation("Product");
                 });
@@ -798,7 +680,7 @@ namespace Server.Data.Migrations
 
             modelBuilder.Entity("Server.Entities.Order", b =>
                 {
-                    b.Navigation("OrderItems");
+                    b.Navigation("SubProducts");
                 });
 
             modelBuilder.Entity("Server.Entities.Product", b =>
@@ -808,19 +690,12 @@ namespace Server.Data.Migrations
                     b.Navigation("SubProducts");
                 });
 
-            modelBuilder.Entity("Server.Entities.Report", b =>
-                {
-                    b.Navigation("OrderItems");
-                });
-
             modelBuilder.Entity("Server.Entities.User", b =>
                 {
                     b.Navigation("Cart")
                         .IsRequired();
 
                     b.Navigation("Products");
-
-                    b.Navigation("Reports");
                 });
 #pragma warning restore 612, 618
         }

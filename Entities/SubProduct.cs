@@ -16,5 +16,7 @@ public class SubProduct
 
     // Foreign key to Product
     public Guid Product_Id { get; set; }
+    public Guid? Order_Id { get; set; }
+    public virtual Order? Order { get; set; } = null!;
     public virtual Product? Product { get; set; } = null!;
 }

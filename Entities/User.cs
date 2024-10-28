@@ -8,6 +8,5 @@ public class User : IdentityUser
     public string? FisrtName { get; set; } = string.Empty;
     public string? LastName { get; set; } = string.Empty;
     public Cart Cart { get; set; } = null!;
-    public virtual ICollection<Report> Reports { get; set; } = new HashSet<Report>();
     public virtual ICollection<Product> Products { get; set; } = new HashSet<Product>();
 }

@@ -10,6 +10,7 @@ namespace Server.Contracts;
 public interface IProduct
 {
     Task<List<Product>> GetAllProducts();
+    Task<List<Product>> GetBestSellerProducts();
     Task<IActionResult> GetPaginationProducts(PaginationFilter filter, string route);
     Task<Product> GetById(Guid ProductId);
     Task<Response<Product>> AddProduct(Product pro);
