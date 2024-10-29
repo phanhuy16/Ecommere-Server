@@ -12,8 +12,8 @@ using Server.Data;
 namespace Server.Data.Migrations
 {
     [DbContext(typeof(EFDataContext))]
-    [Migration("20241028045532_UpdateSubProduct")]
-    partial class UpdateSubProduct
+    [Migration("20241029074935_CreateCart")]
+    partial class CreateCart
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -54,13 +54,13 @@ namespace Server.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "87575734-2d07-4d82-95dd-67036bcb8fcc",
+                            Id = "86388e43-aeff-46aa-b29e-3c3c568d5ac3",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
-                            Id = "a6a00681-09a0-4a63-bee3-90d450b5601e",
+                            Id = "d8dda805-4389-47a4-977e-f8db91e02ded",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         });
@@ -178,11 +178,33 @@ namespace Server.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("Created_At")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("Color")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("Updated_At")
-                        .HasColumnType("datetime2");
+                    b.Property<int>("Count")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,6)");
+
+                    b.Property<int>("Qty")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Size")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("SubProductId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Cart_Id");
+
+                    b.HasIndex("SubProductId");
 
                     b.ToTable("carts", (string)null);
                 });
@@ -226,9 +248,6 @@ namespace Server.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("Cart_Id")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("CreateBy")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -237,8 +256,6 @@ namespace Server.Data.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Order_Id");
-
-                    b.HasIndex("Cart_Id");
 
                     b.ToTable("orders", (string)null);
                 });
@@ -459,6 +476,9 @@ namespace Server.Data.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
+                    b.Property<Guid>("Cart_Id")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
@@ -513,6 +533,8 @@ namespace Server.Data.Migrations
                         .HasColumnType("nvarchar(256)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Cart_Id");
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
@@ -578,13 +600,13 @@ namespace Server.Data.Migrations
 
             modelBuilder.Entity("Server.Entities.Cart", b =>
                 {
-                    b.HasOne("Server.Entities.User", "User")
-                        .WithOne("Cart")
-                        .HasForeignKey("Server.Entities.Cart", "User_Id")
+                    b.HasOne("Server.Entities.SubProduct", "SubProduct")
+                        .WithMany("Carts")
+                        .HasForeignKey("SubProductId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("User");
+                    b.Navigation("SubProduct");
                 });
 
             modelBuilder.Entity("Server.Entities.Category", b =>
@@ -595,13 +617,6 @@ namespace Server.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Parent");
-                });
-
-            modelBuilder.Entity("Server.Entities.Order", b =>
-                {
-                    b.HasOne("Server.Entities.Cart", null)
-                        .WithMany("Orders")
-                        .HasForeignKey("Cart_Id");
                 });
 
             modelBuilder.Entity("Server.Entities.Product", b =>
@@ -658,9 +673,15 @@ namespace Server.Data.Migrations
                     b.Navigation("category");
                 });
 
-            modelBuilder.Entity("Server.Entities.Cart", b =>
+            modelBuilder.Entity("Server.Entities.User", b =>
                 {
-                    b.Navigation("Orders");
+                    b.HasOne("Server.Entities.Cart", "Cart")
+                        .WithMany()
+                        .HasForeignKey("Cart_Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Cart");
                 });
 
             modelBuilder.Entity("Server.Entities.Category", b =>
@@ -684,11 +705,13 @@ namespace Server.Data.Migrations
                     b.Navigation("SubProducts");
                 });
 
+            modelBuilder.Entity("Server.Entities.SubProduct", b =>
+                {
+                    b.Navigation("Carts");
+                });
+
             modelBuilder.Entity("Server.Entities.User", b =>
                 {
-                    b.Navigation("Cart")
-                        .IsRequired();
-
                     b.Navigation("Products");
                 });
 #pragma warning restore 612, 618

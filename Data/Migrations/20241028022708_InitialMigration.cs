@@ -209,20 +209,20 @@ namespace Server.Data.Migrations
                 columns: table => new
                 {
                     Cart_Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    User_Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Created_At = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Updated_At = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_carts", x => x.Cart_Id);
-                    table.ForeignKey(
-                        name: "FK_carts_AspNetUsers_User_Id",
-                        column: x => x.User_Id,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
+                }
+                // constraints: table =>
+                // {
+                //     table.PrimaryKey("PK_carts", x => x.Cart_Id);
+                //     table.ForeignKey(
+                //         name: "FK_carts_AspNetUsers_User_Id",
+                //         column: x => x.User_Id,
+                //         principalTable: "AspNetUsers",
+                //         principalColumn: "Id",
+                //         onDelete: ReferentialAction.Restrict);
+                // }
+                );
 
             migrationBuilder.CreateTable(
                 name: "Products",
@@ -403,11 +403,11 @@ namespace Server.Data.Migrations
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
 
-            migrationBuilder.CreateIndex(
-                name: "IX_carts_User_Id",
-                table: "carts",
-                column: "User_Id",
-                unique: true);
+            // migrationBuilder.CreateIndex(
+            //     name: "IX_carts_User_Id",
+            //     table: "carts",
+            //     column: "User_Id",
+            //     unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Categories_ParentId",

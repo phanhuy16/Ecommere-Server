@@ -8,7 +8,7 @@ using Server.Utilities.Response;
 
 namespace Server.Controllers;
 
-[Authorize]
+// [Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class CartsController : ControllerBase
@@ -19,26 +19,10 @@ public class CartsController : ControllerBase
         _cartService = cartService;
     }
 
-    [HttpGet]
-    [HttpGet, Route("getall")]
-    [ProducesResponseType(typeof(List<Cart>), (int)HttpStatusCode.OK)]
-    public async Task<ActionResult> GetAll()
-    {
-        var response = await _cartService.GetAll();
-        return Ok(response);
-    }
-
-    [HttpGet, Route("getbyid/{CartId}")]
-    public async Task<ActionResult> GetById(Guid CartId)
-    {
-        var response = await _cartService.GetById(CartId);
-        return Ok(response);
-    }
-
     [HttpPost]
-    [Route("post")]
+    [Route("add-new")]
     [ProducesResponseType(typeof(Response<Cart>), (int)HttpStatusCode.OK)]
-    public async Task<ActionResult> Post([FromBody] Cart cart)
+    public async Task<ActionResult> AddMultiple([FromBody] Cart cart)
     {
         if (!ModelState.IsValid)
         {
@@ -49,33 +33,19 @@ public class CartsController : ControllerBase
             });
         }
 
-        var response = await _cartService.Add(cart);
+        var response = await _cartService.AddMultiple(cart);
         if (response.IsSuccess)
         {
             return Ok(response);
         }
         return BadRequest(response);
     }
-
     [HttpDelete]
-    [Route("delete/{CartId}")]
+    [Route("delete")]
     [ProducesResponseType(typeof(Response<Cart>), (int)HttpStatusCode.OK)]
-    public async Task<ActionResult> Delete(Guid CartId)
+    public async Task<ActionResult> Delete([FromQuery] Guid id)
     {
-        var response = await _cartService.Delete(CartId);
-        if (response.IsSuccess)
-        {
-            return Ok(response);
-        }
-        return BadRequest(response);
-    }
-
-    [HttpPut, Route("update/{id}")]
-    [ProducesResponseType(typeof(List<Response<Cart>>), (int)HttpStatusCode.OK)]
-    [ProducesResponseType(typeof(Response<Cart>), (int)HttpStatusCode.BadRequest)]
-    public async Task<ActionResult> Update([FromBody] Cart cart, Guid id)
-    {
-        var response = await _cartService.Update(cart, id);
+        var response = await _cartService.Delete(id);
         if (response.IsSuccess)
         {
             return Ok(response);

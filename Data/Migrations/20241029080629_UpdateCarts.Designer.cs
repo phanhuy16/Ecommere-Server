@@ -12,8 +12,8 @@ using Server.Data;
 namespace Server.Data.Migrations
 {
     [DbContext(typeof(EFDataContext))]
-    [Migration("20241028045532_UpdateSubProduct")]
-    partial class UpdateSubProduct
+    [Migration("20241029080629_UpdateCarts")]
+    partial class UpdateCarts
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -54,13 +54,13 @@ namespace Server.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "87575734-2d07-4d82-95dd-67036bcb8fcc",
+                            Id = "d8f957a0-2123-4e8e-982c-60bd874819ca",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
-                            Id = "a6a00681-09a0-4a63-bee3-90d450b5601e",
+                            Id = "60483836-e8dc-464d-9222-7008b1cc3152",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         });
@@ -174,15 +174,42 @@ namespace Server.Data.Migrations
 
             modelBuilder.Entity("Server.Entities.Cart", b =>
                 {
-                    b.Property<Guid>("Cart_Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("Created_At")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("Color")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("Updated_At")
-                        .HasColumnType("datetime2");
+                    b.Property<int>("Count")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,6)");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Qty")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Size")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("SubProductId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("SubProductId");
 
                     b.ToTable("carts", (string)null);
                 });
@@ -226,9 +253,6 @@ namespace Server.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("Cart_Id")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("CreateBy")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -237,8 +261,6 @@ namespace Server.Data.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Order_Id");
-
-                    b.HasIndex("Cart_Id");
 
                     b.ToTable("orders", (string)null);
                 });
@@ -578,13 +600,21 @@ namespace Server.Data.Migrations
 
             modelBuilder.Entity("Server.Entities.Cart", b =>
                 {
-                    b.HasOne("Server.Entities.User", "User")
-                        .WithOne("Cart")
-                        .HasForeignKey("Server.Entities.Cart", "User_Id")
+                    b.HasOne("Server.Entities.Product", "Products")
+                        .WithMany("Carts")
+                        .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("User");
+                    b.HasOne("Server.Entities.SubProduct", "SubProduct")
+                        .WithMany("Carts")
+                        .HasForeignKey("SubProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Products");
+
+                    b.Navigation("SubProduct");
                 });
 
             modelBuilder.Entity("Server.Entities.Category", b =>
@@ -595,13 +625,6 @@ namespace Server.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Parent");
-                });
-
-            modelBuilder.Entity("Server.Entities.Order", b =>
-                {
-                    b.HasOne("Server.Entities.Cart", null)
-                        .WithMany("Orders")
-                        .HasForeignKey("Cart_Id");
                 });
 
             modelBuilder.Entity("Server.Entities.Product", b =>
@@ -658,11 +681,6 @@ namespace Server.Data.Migrations
                     b.Navigation("category");
                 });
 
-            modelBuilder.Entity("Server.Entities.Cart", b =>
-                {
-                    b.Navigation("Orders");
-                });
-
             modelBuilder.Entity("Server.Entities.Category", b =>
                 {
                     b.Navigation("ProductCategories");
@@ -679,16 +697,20 @@ namespace Server.Data.Migrations
 
             modelBuilder.Entity("Server.Entities.Product", b =>
                 {
+                    b.Navigation("Carts");
+
                     b.Navigation("ProductCategories");
 
                     b.Navigation("SubProducts");
                 });
 
+            modelBuilder.Entity("Server.Entities.SubProduct", b =>
+                {
+                    b.Navigation("Carts");
+                });
+
             modelBuilder.Entity("Server.Entities.User", b =>
                 {
-                    b.Navigation("Cart")
-                        .IsRequired();
-
                     b.Navigation("Products");
                 });
 #pragma warning restore 612, 618

@@ -122,11 +122,16 @@ public partial class EFDataContext : IdentityDbContext<User>
         modelBuilder.Entity<Cart>(entity =>
         {
             entity.ToTable("carts");
-            entity.HasKey(s => s.Cart_Id);
+            entity.HasKey(s => s.Id);
 
-            entity.HasOne(c => c.User)
-                .WithOne(c => c.Cart)
-                .HasForeignKey<Cart>(c => c.User_Id)
+            entity.HasOne(c => c.SubProduct)
+                .WithMany(c => c.Carts)
+                .HasForeignKey(c => c.SubProductId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(c => c.Products)
+                .WithMany(c => c.Carts)
+                .HasForeignKey(c => c.ProductId)
                 .OnDelete(DeleteBehavior.Restrict);
 
         });

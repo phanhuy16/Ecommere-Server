@@ -2,10 +2,16 @@ namespace Server.Entities;
 
 public class Cart
 {
-    public Guid Cart_Id { get; set; }
-    public string User_Id { get; set; } = string.Empty;
-    public DateTime Created_At { get; set; }
-    public DateTime Updated_At { get; set; }
-    public User User { get; set; } = null!;
-    public virtual ICollection<Order> Orders { get; set; } = new HashSet<Order>();
+    public Guid Id { get; set; }
+    public string CreatedBy { get; set; } = string.Empty;
+    public int Count { get; set; }
+    public string Size { get; set; } = string.Empty;
+    public string Color { get; set; } = string.Empty;
+    public decimal Price { get; set; }
+    public int Qty { get; set; }
+
+    public Guid SubProductId { get; set; }
+    public Guid ProductId { get; set; }
+    public virtual SubProduct? SubProduct { get; set; } = null!;
+    public virtual Product? Products { get; set; } = null!;
 }

@@ -184,14 +184,7 @@ namespace Server.Data.Migrations
                     b.Property<DateTime>("Updated_At")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("User_Id")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
                     b.HasKey("Cart_Id");
-
-                    b.HasIndex("User_Id")
-                        .IsUnique();
 
                     b.ToTable("carts", (string)null);
                 });
@@ -585,16 +578,6 @@ namespace Server.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Server.Entities.Cart", b =>
-                {
-                    b.HasOne("Server.Entities.User", "User")
-                        .WithOne("Cart")
-                        .HasForeignKey("Server.Entities.Cart", "User_Id")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
 
             modelBuilder.Entity("Server.Entities.Category", b =>
                 {

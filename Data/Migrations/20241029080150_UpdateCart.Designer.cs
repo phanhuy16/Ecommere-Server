@@ -12,8 +12,8 @@ using Server.Data;
 namespace Server.Data.Migrations
 {
     [DbContext(typeof(EFDataContext))]
-    [Migration("20241028045532_UpdateSubProduct")]
-    partial class UpdateSubProduct
+    [Migration("20241029080150_UpdateCart")]
+    partial class UpdateCart
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -54,13 +54,13 @@ namespace Server.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "87575734-2d07-4d82-95dd-67036bcb8fcc",
+                            Id = "28dcd687-44ec-4b75-aff6-1e9a128ed374",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
-                            Id = "a6a00681-09a0-4a63-bee3-90d450b5601e",
+                            Id = "4e85cce1-bb2f-40cb-8007-32fdeb4a101a",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         });
@@ -174,15 +174,49 @@ namespace Server.Data.Migrations
 
             modelBuilder.Entity("Server.Entities.Cart", b =>
                 {
-                    b.Property<Guid>("Cart_Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("Created_At")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("Color")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("Updated_At")
-                        .HasColumnType("datetime2");
+                    b.Property<int>("Count")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,6)");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Qty")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Size")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("SubProductId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("SubProductId");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
 
                     b.ToTable("carts", (string)null);
                 });
@@ -226,9 +260,6 @@ namespace Server.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("Cart_Id")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("CreateBy")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -237,8 +268,6 @@ namespace Server.Data.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Order_Id");
-
-                    b.HasIndex("Cart_Id");
 
                     b.ToTable("orders", (string)null);
                 });
@@ -578,11 +607,27 @@ namespace Server.Data.Migrations
 
             modelBuilder.Entity("Server.Entities.Cart", b =>
                 {
-                    b.HasOne("Server.Entities.User", "User")
-                        .WithOne("Cart")
-                        .HasForeignKey("Server.Entities.Cart", "User_Id")
+                    b.HasOne("Server.Entities.Product", "Products")
+                        .WithMany("Carts")
+                        .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("Server.Entities.SubProduct", "SubProduct")
+                        .WithMany("Carts")
+                        .HasForeignKey("SubProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Server.Entities.User", "User")
+                        .WithOne("Cart")
+                        .HasForeignKey("Server.Entities.Cart", "UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Products");
+
+                    b.Navigation("SubProduct");
 
                     b.Navigation("User");
                 });
@@ -595,13 +640,6 @@ namespace Server.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Parent");
-                });
-
-            modelBuilder.Entity("Server.Entities.Order", b =>
-                {
-                    b.HasOne("Server.Entities.Cart", null)
-                        .WithMany("Orders")
-                        .HasForeignKey("Cart_Id");
                 });
 
             modelBuilder.Entity("Server.Entities.Product", b =>
@@ -658,11 +696,6 @@ namespace Server.Data.Migrations
                     b.Navigation("category");
                 });
 
-            modelBuilder.Entity("Server.Entities.Cart", b =>
-                {
-                    b.Navigation("Orders");
-                });
-
             modelBuilder.Entity("Server.Entities.Category", b =>
                 {
                     b.Navigation("ProductCategories");
@@ -679,9 +712,16 @@ namespace Server.Data.Migrations
 
             modelBuilder.Entity("Server.Entities.Product", b =>
                 {
+                    b.Navigation("Carts");
+
                     b.Navigation("ProductCategories");
 
                     b.Navigation("SubProducts");
+                });
+
+            modelBuilder.Entity("Server.Entities.SubProduct", b =>
+                {
+                    b.Navigation("Carts");
                 });
 
             modelBuilder.Entity("Server.Entities.User", b =>
