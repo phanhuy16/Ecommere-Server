@@ -33,6 +33,7 @@ public class CartService : ICart
                 Qty = carts.Qty,
                 SubProductId = carts.SubProductId,
                 ProductId = carts.ProductId,
+                Image = carts.Image,
             };
 
             // Thêm toàn bộ danh sách carts vào cơ sở dữ liệu
@@ -52,8 +53,6 @@ public class CartService : ICart
             throw new Exception($"An error occurred while adding the carts: {ex.Message}");
         }
     }
-
-
 
     public async Task<Response<Cart>> Delete(Guid Id)
     {
@@ -99,6 +98,47 @@ public class CartService : ICart
             };
         }
     }
+    public async Task<Response<List<Cart>>> GetCatItem(string createdBy)
+    {
+        try
+        {
+            var cart = await _context.Carts
+                .Where(car => car.CreatedBy == createdBy) // Lọc theo CreatedBy
+                .Select(car => new Cart
+                {
+                    Id = car.Id,
+                    CreatedBy = car.CreatedBy,
+                    Count = car.Count,
+                    Size = car.Size,
+                    Color = car.Color,
+                    Price = car.Price,
+                    Qty = car.Qty,
+                    SubProductId = car.SubProductId,
+                    ProductId = car.ProductId,
+                    Image = car.Image,
+                })
+                .OrderByDescending(x => x.Id)
+                .ToListAsync();
 
+            return new Response<List<Cart>>
+            {
+                Data = cart,
+                IsSuccess = true,
+                Message = "Get all cart items successfully.",
+                HttpStatusCode = HttpStatusCode.OK,
+            };
+        }
+        catch (Exception ex)
+        {
+            // Thay vì ném một exception mới, bạn có thể trả về một Response có lỗi
+            return new Response<List<Cart>>
+            {
+                Data = null,
+                IsSuccess = false,
+                Message = ex.Message,
+                HttpStatusCode = HttpStatusCode.InternalServerError,
+            };
+        }
+    }
 
 }

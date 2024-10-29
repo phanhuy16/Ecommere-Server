@@ -9,6 +9,7 @@ public class Cart
     public string Color { get; set; } = string.Empty;
     public decimal Price { get; set; }
     public int Qty { get; set; }
+    public string Image { get; set; } = string.Empty;
 
     public Guid SubProductId { get; set; }
     public Guid ProductId { get; set; }

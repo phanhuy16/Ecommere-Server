@@ -8,7 +8,7 @@ using Server.Utilities.Response;
 
 namespace Server.Controllers;
 
-// [Authorize]
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class CartsController : ControllerBase
@@ -17,6 +17,13 @@ public class CartsController : ControllerBase
     public CartsController(ICart cartService)
     {
         _cartService = cartService;
+    }
+
+    [HttpGet, Route("get-cart")]
+    public async Task<ActionResult> GetCatItem([FromQuery] string id)
+    {
+        var response = await _cartService.GetCatItem(id);
+        return Ok(response);
     }
 
     [HttpPost]
