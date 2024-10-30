@@ -22,21 +22,21 @@ public class CartService : ICart
     {
         try
         {
-            // Kiểm tra nếu giỏ hàng đã tồn tại dựa trên CreatedBy và ProductId
-            var existingCart = await _context.Carts
-                .FirstOrDefaultAsync(c => c.ProductId == carts.ProductId);
+            // // Kiểm tra nếu giỏ hàng đã tồn tại dựa trên CreatedBy và ProductId
+            // var existingCart = await _context.Carts
+            //     .FirstOrDefaultAsync(c => c.ProductId == carts.ProductId);
 
-            if (existingCart != null)
-            {
-                // Nếu mục đã tồn tại, không thêm mới và trả về thông báo phù hợp
-                return new Response<Cart>
-                {
-                    Data = existingCart,
-                    IsSuccess = false,
-                    Message = _appSettings.GetConfigurationValue("CartMessages", "CartAlreadyExists"),
-                    HttpStatusCode = HttpStatusCode.Conflict, // Mã trạng thái cho xung đột
-                };
-            }
+            // if (existingCart != null)
+            // {
+            //     // Nếu mục đã tồn tại, không thêm mới và trả về thông báo phù hợp
+            //     return new Response<Cart>
+            //     {
+            //         Data = existingCart,
+            //         IsSuccess = false,
+            //         Message = _appSettings.GetConfigurationValue("CartMessages", "CartAlreadyExists"),
+            //         HttpStatusCode = HttpStatusCode.Conflict, // Mã trạng thái cho xung đột
+            //     };
+            // }
             var cart = new Cart()
             {
                 Id = carts.Id,

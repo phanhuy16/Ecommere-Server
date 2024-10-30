@@ -344,51 +344,57 @@ public class ProductService : IProduct
         }
     }
 
-    public async Task<Response<SubProduct>> DeleteSubProduct(Guid SubProductId)
+    public async Task<Response<SubProduct>> DeleteSubProduct(Guid Id)
     {
-        try
+        using (var transaction = await _context.Database.BeginTransactionAsync())
         {
-            if (SubProductId <= Guid.Empty)
+            try
             {
+                if (Id <= Guid.Empty)
+                {
+                    return new Response<SubProduct>
+                    {
+                        IsSuccess = false,
+                        Message = _appSettings.GetConfigurationValue("ProductMessages", "ProductNotFound"),
+                        HttpStatusCode = HttpStatusCode.BadRequest,
+                    };
+                }
+
+                var sub = _context.SubProducts.Where(x => x.Id == Id).FirstOrDefault();
+                if (sub == null)
+                {
+                    return new Response<SubProduct>
+                    {
+                        IsSuccess = false,
+                        Message = _appSettings.GetConfigurationValue("ProductMessages", "ProductNotFound"),
+                        HttpStatusCode = HttpStatusCode.BadRequest,
+                    };
+                }
+
+                _context.SubProducts.Remove(sub);
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                return new Response<SubProduct>
+                {
+                    Data = sub,
+                    IsSuccess = true,
+                    SubProductId = Id,
+                    Message = _appSettings.GetConfigurationValue("ProductMessages", "DeleteProductSuccess"),
+                    HttpStatusCode = HttpStatusCode.OK,
+                };
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
                 return new Response<SubProduct>
                 {
                     IsSuccess = false,
-                    Message = _appSettings.GetConfigurationValue("ProductMessages", "ProductNotFound"),
+                    Message = _appSettings.GetConfigurationValue("ProductMessages", "DeleteProductFailure") + " " +
+                ex.Message.ToString(),
                     HttpStatusCode = HttpStatusCode.BadRequest,
                 };
             }
-            var sub = _context.SubProducts.Where(x => x.Id == SubProductId).FirstOrDefault();
-            if (sub == null)
-            {
-                return new Response<SubProduct>
-                {
-                    IsSuccess = false,
-                    Message = _appSettings.GetConfigurationValue("ProductMessages", "ProductNotFound"),
-                    HttpStatusCode = HttpStatusCode.BadRequest,
-                };
-            }
-
-            _context.SubProducts.Remove(sub);
-            await _context.SaveChangesAsync();
-
-            return new Response<SubProduct>
-            {
-                Data = sub,
-                IsSuccess = true,
-                SubProductId = SubProductId,
-                Message = _appSettings.GetConfigurationValue("ProductMessages", "DeleteProductSuccess"),
-                HttpStatusCode = HttpStatusCode.OK,
-            };
-        }
-        catch (Exception ex)
-        {
-            return new Response<SubProduct>
-            {
-                IsSuccess = false,
-                Message = _appSettings.GetConfigurationValue("ProductMessages", "DeleteProductFailure") + " " +
-            ex.Message.ToString(),
-                HttpStatusCode = HttpStatusCode.BadRequest,
-            };
         }
     }
 

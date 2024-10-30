@@ -20,6 +20,6 @@ public interface IProduct
     Task<IEnumerable<Product>> Search(string slug);
     Task<Response<FilterValues>> GetAllSubProducts();
     Task<List<Product>> FilterProductsAsync(FilterDto filter);
-    Task<Response<SubProduct>> DeleteSubProduct(Guid SubProductId);
+    Task<Response<SubProduct>> DeleteSubProduct(Guid Id);
     Task<Response<SubProduct>> UpdateSubProduct(SubProduct sub, Guid SubProductId);
 }
