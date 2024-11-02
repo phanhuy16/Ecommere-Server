@@ -51,13 +51,13 @@ namespace Server.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "5a56b525-d4cf-4791-b368-9a48002f7a98",
+                            Id = "7c66dac1-813c-4186-be9f-27665baa93d2",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
-                            Id = "029c8a67-07a0-434c-8674-7eee637d1954",
+                            Id = "7edd86f8-910b-4d52-8421-1efddffd909a",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         });
@@ -191,7 +191,7 @@ namespace Server.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,6)");
+                        .HasColumnType("decimal(6,2)");
 
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uniqueidentifier");
@@ -225,6 +225,9 @@ namespace Server.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("CategoryId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -247,14 +250,14 @@ namespace Server.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ParentId");
+                    b.HasIndex("CategoryId");
 
-                    b.ToTable("Categories", (string)null);
+                    b.ToTable("Categories");
                 });
 
             modelBuilder.Entity("Server.Entities.Order", b =>
                 {
-                    b.Property<Guid>("Order_Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
@@ -265,9 +268,9 @@ namespace Server.Data.Migrations
                     b.Property<int>("Total")
                         .HasColumnType("int");
 
-                    b.HasKey("Order_Id");
+                    b.HasKey("Id");
 
-                    b.ToTable("orders", (string)null);
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("Server.Entities.Product", b =>
@@ -292,6 +295,9 @@ namespace Server.Data.Migrations
                     b.Property<string>("Images")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid?>("ProductId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Slug")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -307,15 +313,11 @@ namespace Server.Data.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
+                    b.HasKey("Id");
 
-                    b.HasKey("Id")
-                        .HasName("PK_products_id");
+                    b.HasIndex("ProductId");
 
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Products", (string)null);
+                    b.ToTable("Products");
                 });
 
             modelBuilder.Entity("Server.Entities.ProductCategory", b =>
@@ -326,12 +328,11 @@ namespace Server.Data.Migrations
                     b.Property<Guid?>("CategoryId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("ProductId", "CategoryId")
-                        .HasName("PK_ProductCategory");
+                    b.HasKey("ProductId", "CategoryId");
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("ProductCategories", (string)null);
+                    b.ToTable("ProductCategories");
                 });
 
             modelBuilder.Entity("Server.Entities.Promotion", b =>
@@ -370,10 +371,9 @@ namespace Server.Data.Migrations
                     b.Property<int>("Value")
                         .HasColumnType("int");
 
-                    b.HasKey("Id")
-                        .HasName("PK_promotion_id");
+                    b.HasKey("Id");
 
-                    b.ToTable("Promotion", (string)null);
+                    b.ToTable("Promotions");
                 });
 
             modelBuilder.Entity("Server.Entities.SubProduct", b =>
@@ -395,13 +395,13 @@ namespace Server.Data.Migrations
                     b.Property<string>("Images")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("Order_Id")
+                    b.Property<Guid?>("OrderId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,6)");
+                        .HasColumnType("decimal(6,2)");
 
-                    b.Property<Guid>("Product_Id")
+                    b.Property<Guid>("ProductId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Qty")
@@ -414,68 +414,67 @@ namespace Server.Data.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
-                    b.HasKey("Id")
-                        .HasName("PK_subproducts_id");
+                    b.HasKey("Id");
 
-                    b.HasIndex("Order_Id");
+                    b.HasIndex("OrderId");
 
-                    b.HasIndex("Product_Id");
+                    b.HasIndex("ProductId");
 
-                    b.ToTable("SubProducts", (string)null);
+                    b.ToTable("SubProducts");
                 });
 
             modelBuilder.Entity("Server.Entities.Supplier", b =>
                 {
-                    b.Property<Guid>("id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("active")
+                    b.Property<int>("Active")
                         .HasColumnType("int");
 
-                    b.Property<Guid?>("category_id")
+                    b.Property<Guid>("CategoryId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("contact")
+                    b.Property<string>("Contact")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("created_at")
+                    b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("email")
+                    b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool?>("isTalking")
+                    b.Property<string>("Imgae")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool?>("IsTalking")
                         .HasColumnType("bit");
 
-                    b.Property<string>("name")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("photoUrl")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<float>("price")
+                    b.Property<float>("Price")
                         .HasColumnType("real");
 
-                    b.Property<string>("product")
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Slug")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("slug")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("updated_at")
+                    b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
-                    b.HasKey("id")
-                        .HasName("PK_supplier_id");
+                    b.HasKey("Id");
 
-                    b.HasIndex("category_id");
+                    b.HasIndex("CategoryId");
 
-                    b.ToTable("Suppliers", (string)null);
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("Suppliers");
                 });
 
             modelBuilder.Entity("Server.Entities.User", b =>
@@ -624,19 +623,16 @@ namespace Server.Data.Migrations
 
             modelBuilder.Entity("Server.Entities.Category", b =>
                 {
-                    b.HasOne("Server.Entities.Category", "Parent")
+                    b.HasOne("Server.Entities.Category", null)
                         .WithMany("SubCategories")
-                        .HasForeignKey("ParentId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Parent");
+                        .HasForeignKey("CategoryId");
                 });
 
             modelBuilder.Entity("Server.Entities.Product", b =>
                 {
-                    b.HasOne("Server.Entities.User", null)
+                    b.HasOne("Server.Entities.Product", null)
                         .WithMany("Products")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("ProductId");
                 });
 
             modelBuilder.Entity("Server.Entities.ProductCategory", b =>
@@ -662,12 +658,11 @@ namespace Server.Data.Migrations
                 {
                     b.HasOne("Server.Entities.Order", "Order")
                         .WithMany("SubProducts")
-                        .HasForeignKey("Order_Id")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("OrderId");
 
                     b.HasOne("Server.Entities.Product", "Product")
                         .WithMany("SubProducts")
-                        .HasForeignKey("Product_Id")
+                        .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -678,12 +673,21 @@ namespace Server.Data.Migrations
 
             modelBuilder.Entity("Server.Entities.Supplier", b =>
                 {
-                    b.HasOne("Server.Entities.Category", "category")
+                    b.HasOne("Server.Entities.Category", "Category")
                         .WithMany("Suppliers")
-                        .HasForeignKey("category_id")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("category");
+                    b.HasOne("Server.Entities.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+
+                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("Server.Entities.Category", b =>
@@ -706,17 +710,14 @@ namespace Server.Data.Migrations
 
                     b.Navigation("ProductCategories");
 
+                    b.Navigation("Products");
+
                     b.Navigation("SubProducts");
                 });
 
             modelBuilder.Entity("Server.Entities.SubProduct", b =>
                 {
                     b.Navigation("Carts");
-                });
-
-            modelBuilder.Entity("Server.Entities.User", b =>
-                {
-                    b.Navigation("Products");
                 });
 #pragma warning restore 612, 618
         }

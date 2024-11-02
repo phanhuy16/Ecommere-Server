@@ -1,3 +1,7 @@
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
+
 namespace Server.Entities;
 
 public class Cart
@@ -11,9 +15,11 @@ public class Cart
     public decimal Price { get; set; }
     public int Qty { get; set; }
     public string Image { get; set; } = string.Empty;
-
     public Guid SubProductId { get; set; }
     public Guid ProductId { get; set; }
-    public virtual SubProduct? SubProduct { get; set; } = null!;
-    public virtual Product? Products { get; set; } = null!;
+
+    [JsonIgnore]
+    public virtual SubProduct SubProduct { get; set; } = null!;
+    [JsonIgnore]
+    public virtual Product Products { get; set; } = null!;
 }

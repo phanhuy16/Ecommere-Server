@@ -9,9 +9,9 @@ namespace Server.Contracts;
 
 public interface ICategory
 {
-    Task<List<Category>> GetAllCategories();
+    Task<Response<List<Category>>> GetAllCategories();
     Task<IActionResult> GetPaginationCategories(PaginationFilter filter, string route);
-    Task<Category> GetById(Guid CategoryId);
+    Task<Response<Category>> GetById(Guid CategoryId);
     Task<Response<Category>> Add(Category cate);
     Task<Response<Category>> Update(Category cate, Guid CategoryId);
 

@@ -6,11 +6,11 @@ namespace Server.Contracts;
 
 public interface IAccount
 {
-    Task<ActionResult> Register(RegisterDto registerDto);
+    Task<ResponseDto<RegisterDto>> Register(RegisterDto registerDto);
 
-    Task<ActionResult<ResponseDto>> Login(LoginDto loginDto);
+    Task<ResponseDto<LoginDto>> Login(LoginDto loginDto);
 
-    Task<ActionResult<UserDetailDto>> GetUserDetail();
+    Task<ResponseDto<UserDetailDto>> GetUserDetail();
 
     Task<ActionResult<IEnumerable<UserDetailDto>>> GetUsers();
 }

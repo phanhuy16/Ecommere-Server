@@ -21,12 +21,12 @@ namespace Server.Controllers
         [AllowAnonymous]
         [HttpPost]
         [Route("sign-up")]
-        [ProducesResponseType(typeof(ResponseDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ResponseDto<Customers>), (int)HttpStatusCode.OK)]
         public async Task<ActionResult> RegisterCustomer(Customers customers)
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(new ResponseDto
+                return BadRequest(new ResponseDto<Customers>
                 {
                     IsSuccess = false,
                     Message = "Invalid data."
@@ -41,9 +41,9 @@ namespace Server.Controllers
         [AllowAnonymous]
         [HttpPost]
         [Route("login")]
-        [ProducesResponseType(typeof(ResponseDto), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ResponseDto), (int)HttpStatusCode.Unauthorized)]
-        public async Task<ActionResult<ResponseDto>> Login(LoginDto login)
+        [ProducesResponseType(typeof(ResponseDto<LoginDto>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ResponseDto<LoginDto>), (int)HttpStatusCode.Unauthorized)]
+        public async Task<ActionResult<ResponseDto<LoginDto>>> Login(LoginDto login)
         {
             var response = await _customerService.Login(login);
 

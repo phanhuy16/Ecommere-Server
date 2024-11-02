@@ -27,27 +27,29 @@ public class AccountService : IAccount
         _httpContextAccessor = httpContextAccessor;
     }
 
-    public async Task<ActionResult> Register(RegisterDto registerDto)
+    public async Task<ResponseDto<RegisterDto>> Register(RegisterDto registerDto)
     {
         // Kiểm tra xem người dùng đã tồn tại chưa
         var existingUserByEmail = await _userManager.FindByEmailAsync(registerDto.Email);
         if (existingUserByEmail != null)
         {
-            return new BadRequestObjectResult(new ResponseDto
+            return new ResponseDto<RegisterDto>
             {
                 IsSuccess = false,
-                Message = "User with this email already exists."
-            });
+                Message = "User with this email already exists.",
+                HttpStatusCode = HttpStatusCode.BadRequest,
+            };
         }
 
         var existingUserByUserName = await _userManager.FindByNameAsync(registerDto.Email);
         if (existingUserByUserName != null)
         {
-            return new BadRequestObjectResult(new ResponseDto
+            return new ResponseDto<RegisterDto>
             {
                 IsSuccess = false,
-                Message = "User with this user already exists."
-            });
+                Message = "User with this user already exists.",
+                HttpStatusCode = HttpStatusCode.BadRequest,
+            };
         }
 
         var user = new User
@@ -62,7 +64,12 @@ public class AccountService : IAccount
         if (!result.Succeeded)
         {
             var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-            return new BadRequestObjectResult($"Registration failed: {errors}");
+            return new ResponseDto<RegisterDto>
+            {
+                IsSuccess = false,
+                Message = $"Registration failed: {errors}.",
+                HttpStatusCode = HttpStatusCode.BadRequest,
+            };
         }
 
         if (registerDto.Roles == null)
@@ -77,23 +84,24 @@ public class AccountService : IAccount
             }
         }
 
+
         var token = GenerateToken(user);
 
-        return new OkObjectResult(new ResponseDto
+        return new ResponseDto<RegisterDto>
         {
             Token = token,
             IsSuccess = true,
             Message = "Register Successfully.",
-        });
+        };
     }
 
-    public async Task<ActionResult<ResponseDto>> Login(LoginDto loginDto)
+    public async Task<ResponseDto<LoginDto>> Login(LoginDto loginDto)
     {
         var user = await _userManager.FindByEmailAsync(loginDto.Email);
 
         if (user == null)
         {
-            return new ResponseDto
+            return new ResponseDto<LoginDto>
             {
                 IsSuccess = false,
                 Message = "User not found with this email",
@@ -105,7 +113,7 @@ public class AccountService : IAccount
 
         if (!result)
         {
-            return new ResponseDto
+            return new ResponseDto<LoginDto>
             {
                 IsSuccess = false,
                 Message = "Invalid Password.",
@@ -115,7 +123,7 @@ public class AccountService : IAccount
 
         var token = GenerateToken(user);
 
-        return new ResponseDto
+        return new ResponseDto<LoginDto>
         {
             Token = token,
             Id = user.Id,
@@ -157,18 +165,19 @@ public class AccountService : IAccount
         return tokenHandler.WriteToken(token);
     }
 
-    public async Task<ActionResult<UserDetailDto>> GetUserDetail()
+    public async Task<ResponseDto<UserDetailDto>> GetUserDetail()
     {
         var currentUserId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
         var user = await _userManager.FindByIdAsync(currentUserId);
 
         if (user is null)
         {
-            return new NotFoundObjectResult(new ResponseDto
+            return new ResponseDto<UserDetailDto>
             {
                 IsSuccess = false,
-                Message = "User not found"
-            });
+                Message = "User not found",
+                HttpStatusCode = HttpStatusCode.OK,
+            };
         }
 
         var userDetailDto = new UserDetailDto
@@ -182,7 +191,13 @@ public class AccountService : IAccount
             AccessFailedCount = user.AccessFailedCount,
         };
 
-        return new OkObjectResult(userDetailDto);
+        return new ResponseDto<UserDetailDto>
+        {
+            Data = userDetailDto,
+            IsSuccess = true,
+            Message = "User detail",
+            HttpStatusCode = HttpStatusCode.OK,
+        };
     }
 
     public async Task<ActionResult<IEnumerable<UserDetailDto>>> GetUsers()

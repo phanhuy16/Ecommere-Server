@@ -1,5 +1,7 @@
 
 
+using System.Text.Json.Serialization;
+
 namespace Server.Entities;
 
 public class SubProduct
@@ -15,9 +17,13 @@ public class SubProduct
     public DateTime UpdatedAt { get; set; }
 
     // Foreign key to Product
-    public Guid Product_Id { get; set; }
-    public Guid? Order_Id { get; set; }
-    public virtual Order? Order { get; set; } = null!;
-    public virtual Product? Product { get; set; } = null!;
-    public virtual ICollection<Cart>? Carts { get; set; } = new HashSet<Cart>();
+    public Guid ProductId { get; set; }
+    public Guid? OrderId { get; set; }
+
+    [JsonIgnore]
+    public virtual Order Order { get; set; } = null!;
+    [JsonIgnore]
+    public virtual Product Product { get; set; } = null!;
+    [JsonIgnore]
+    public virtual ICollection<Cart> Carts { get; set; } = null!;
 }

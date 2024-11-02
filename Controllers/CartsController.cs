@@ -60,5 +60,11 @@ public class CartsController : ControllerBase
         return BadRequest(response);
     }
 
+    [HttpPut, Route("update-cart")]
+    public async Task<ActionResult<int>> UpdateCartQuantity([FromQuery] Guid id, [FromBody] int count)
+    {
+        var response = await _cartService.UpdateCartQuantity(id, count);
+        return Ok(response);
+    }
 
 }

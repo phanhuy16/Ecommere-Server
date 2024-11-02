@@ -13,7 +13,6 @@ public class PagedResponse<T> : Response<T>
         this.Data = data;
         this.Message = null;
         this.IsSuccess = true;
-        this.Errors = null;
     }
     public int PageNumber { get; }
     public int PageSize { get; }

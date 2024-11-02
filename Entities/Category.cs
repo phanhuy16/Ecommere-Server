@@ -1,5 +1,7 @@
 
 
+using System.Text.Json.Serialization;
+
 namespace Server.Entities;
 
 public class Category
@@ -12,8 +14,10 @@ public class Category
     public DateTime? CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
 
-    public Category? Parent { get; set; } = null!;
-    public ICollection<Category>? SubCategories { get; set; }
-    public virtual ICollection<ProductCategory>? ProductCategories { get; set; } = new HashSet<ProductCategory>();
-    public virtual ICollection<Supplier>? Suppliers { get; set; } = new HashSet<Supplier>();
+    [JsonIgnore]
+    public ICollection<Category> SubCategories { get; set; } = null!;
+    [JsonIgnore]
+    public virtual ICollection<ProductCategory> ProductCategories { get; set; } = null!;
+    [JsonIgnore]
+    public virtual ICollection<Supplier> Suppliers { get; set; } = null!;
 }

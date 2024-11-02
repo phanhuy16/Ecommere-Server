@@ -22,21 +22,6 @@ public class CartService : ICart
     {
         try
         {
-            // // Kiểm tra nếu giỏ hàng đã tồn tại dựa trên CreatedBy và ProductId
-            // var existingCart = await _context.Carts
-            //     .FirstOrDefaultAsync(c => c.ProductId == carts.ProductId);
-
-            // if (existingCart != null)
-            // {
-            //     // Nếu mục đã tồn tại, không thêm mới và trả về thông báo phù hợp
-            //     return new Response<Cart>
-            //     {
-            //         Data = existingCart,
-            //         IsSuccess = false,
-            //         Message = _appSettings.GetConfigurationValue("CartMessages", "CartAlreadyExists"),
-            //         HttpStatusCode = HttpStatusCode.Conflict, // Mã trạng thái cho xung đột
-            //     };
-            // }
             var cart = new Cart()
             {
                 Id = carts.Id,
@@ -97,7 +82,7 @@ public class CartService : ICart
             return new Response<Cart>
             {
                 IsSuccess = true,
-                CartId = Id,
+                Id = Id,
                 Message = _appSettings.GetConfigurationValue("CartMessages", "DeleteCartSuccess"),
                 HttpStatusCode = HttpStatusCode.OK,
             };
@@ -156,4 +141,57 @@ public class CartService : ICart
         }
     }
 
+    public async Task<Response<Cart>> UpdateCartQuantity(Guid Id, int additionalCount)
+    {
+        try
+        {
+            // Kiểm tra nếu Id giỏ hàng hợp lệ
+            if (Id == Guid.Empty)
+            {
+                return new Response<Cart>
+                {
+                    IsSuccess = false,
+                    Message = _appSettings.GetConfigurationValue("CartMessages", "InvalidCartId"),
+                    HttpStatusCode = HttpStatusCode.BadRequest,
+                };
+            }
+
+            // Tìm giỏ hàng dựa trên Id
+            var cart = await _context.Carts.FindAsync(Id);
+
+            if (cart == null)
+            {
+                return new Response<Cart>
+                {
+                    IsSuccess = false,
+                    Message = _appSettings.GetConfigurationValue("CartMessages", "CartNotFound"),
+                    HttpStatusCode = HttpStatusCode.NotFound,
+                };
+            }
+
+            // Cập nhật giá trị Count hiện tại với additionalCount
+            cart.Count += additionalCount;
+
+            // Lưu thay đổi
+            _context.Carts.Update(cart);
+            await _context.SaveChangesAsync();
+
+            return new Response<Cart>
+            {
+                Data = cart,
+                IsSuccess = true,
+                Message = _appSettings.GetConfigurationValue("CartMessages", "UpdateCartSuccess"),
+                HttpStatusCode = HttpStatusCode.OK,
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Response<Cart>
+            {
+                IsSuccess = false,
+                Message = _appSettings.GetConfigurationValue("CartMessages", "UpdateCartFailure") + " " + ex.Message,
+                HttpStatusCode = HttpStatusCode.InternalServerError,
+            };
+        }
+    }
 }

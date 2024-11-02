@@ -45,7 +45,7 @@ public class CategoriesController : ControllerBase
         return Ok(response);
     }
 
-    [Authorize]
+    // [Authorize]
     [HttpPost]
     [Route("add-new")]
     [ProducesResponseType(typeof(Response<Category>), (int)HttpStatusCode.OK)]
@@ -68,7 +68,7 @@ public class CategoriesController : ControllerBase
         return BadRequest(response);
     }
 
-    [Authorize]
+    // [Authorize]
     [HttpDelete]
     [Route("delete/{id}")]
     [ProducesResponseType(typeof(Response<Category>), (int)HttpStatusCode.OK)]
@@ -82,7 +82,7 @@ public class CategoriesController : ControllerBase
         return BadRequest(response);
     }
 
-    [Authorize]
+    // [Authorize]
     [HttpPut, Route("update/{id}")]
     [ProducesResponseType(typeof(List<Response<Category>>), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(Response<Category>), (int)HttpStatusCode.BadRequest)]

@@ -35,27 +35,28 @@ public class CustomerService : ICustomer
     }
 
 
-    public async Task<ActionResult> RegisterCustomer(Customers customer)
+    public async Task<ResponseDto<Customers>> RegisterCustomer(Customers customer)
     {
         // Kiểm tra xem người dùng đã tồn tại chưa
         var existingUserByEmail = await _userManager.FindByEmailAsync(customer.Email);
         if (existingUserByEmail != null)
         {
-            return new BadRequestObjectResult(new ResponseDto
+            return new ResponseDto<Customers>
             {
                 IsSuccess = false,
                 Message = "User with this email already exists."
-            });
+            };
         }
 
         var existingUserByUserName = await _userManager.FindByNameAsync(customer.Email);
         if (existingUserByUserName != null)
         {
-            return new BadRequestObjectResult(new ResponseDto
+            return new ResponseDto<Customers>
             {
                 IsSuccess = false,
-                Message = "User with this user already exists."
-            });
+                Message = "User with this user already exists.",
+                HttpStatusCode = HttpStatusCode.BadRequest,
+            };
         }
 
         var user = new User
@@ -71,7 +72,12 @@ public class CustomerService : ICustomer
         if (!result.Succeeded)
         {
             var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-            return new BadRequestObjectResult($"Registration failed: {errors}");
+            return new ResponseDto<Customers>
+            {
+                IsSuccess = false,
+                Message = $"Registration failed: {errors}",
+                HttpStatusCode = HttpStatusCode.BadRequest,
+            };
         }
 
         if (customer.Roles == null)
@@ -88,13 +94,13 @@ public class CustomerService : ICustomer
 
         var token = GenerateToken(user);
 
-        return new OkObjectResult(new ResponseDto
+        return new ResponseDto<Customers>
         {
             Id = user.Id,
             Token = token,
             IsSuccess = true,
             Message = "Register Successfully.",
-        });
+        };
 
 
         // var sendMail = new MailRequest
@@ -108,13 +114,13 @@ public class CustomerService : ICustomer
 
     }
 
-    public async Task<ActionResult<ResponseDto>> Login(LoginDto login)
+    public async Task<ResponseDto<LoginDto>> Login(LoginDto login)
     {
         var user = await _userManager.FindByEmailAsync(login.Email);
 
         if (user == null)
         {
-            return new ResponseDto
+            return new ResponseDto<LoginDto>
             {
                 IsSuccess = false,
                 Message = "User not found with this email",
@@ -126,7 +132,7 @@ public class CustomerService : ICustomer
 
         if (!result)
         {
-            return new ResponseDto
+            return new ResponseDto<LoginDto>
             {
                 IsSuccess = false,
                 Message = "Invalid Password.",
@@ -136,7 +142,7 @@ public class CustomerService : ICustomer
 
         var token = GenerateToken(user);
 
-        return new ResponseDto
+        return new ResponseDto<LoginDto>
         {
             Token = token,
             Id = user.Id,
@@ -190,33 +196,33 @@ public class CustomerService : ICustomer
         smtp.Disconnect(true);
     }
 
-    public async Task<IActionResult> EmailVerification(string? id, string? code)
-    {
-        if (id == null || code == null)
-        {
-            return new BadRequestObjectResult("Invalid payload");
-        }
+    // public async Task<IActionResult> EmailVerification(string? id, string? code)
+    // {
+    //     if (id == null || code == null)
+    //     {
+    //         return new BadRequestObjectResult("Invalid payload");
+    //     }
 
-        var user = await _userManager.FindByIdAsync(id);
+    //     var user = await _userManager.FindByIdAsync(id);
 
-        if (user == null)
-        {
-            return new BadRequestObjectResult("Invalid payload");
-        }
+    //     if (user == null)
+    //     {
+    //         return new BadRequestObjectResult("Invalid payload");
+    //     }
 
-        var isVerified = await _userManager.ConfirmEmailAsync(user, code);
+    //     var isVerified = await _userManager.ConfirmEmailAsync(user, code);
 
-        if (isVerified.Succeeded)
-        {
-            return new OkObjectResult(new ResponseDto
-            {
-                IsSuccess = true,
-                Message = "Email confirmed",
-            });
-        }
+    //     if (isVerified.Succeeded)
+    //     {
+    //         return new OkObjectResult(new ResponseDto
+    //         {
+    //             IsSuccess = true,
+    //             Message = "Email confirmed",
+    //         });
+    //     }
 
-        return new BadRequestObjectResult("Something went wrong");
-    }
+    //     return new BadRequestObjectResult("Something went wrong");
+    // }
 
     private string GenerateToken(User user)
     {

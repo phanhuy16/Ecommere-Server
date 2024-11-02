@@ -9,7 +9,7 @@ using Server.Utilities.Response;
 
 namespace Server.Controllers;
 
-[Authorize]
+// [Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class SuppliersController : ControllerBase
@@ -39,13 +39,13 @@ public class SuppliersController : ControllerBase
 
     }
 
-    [HttpPost, Route("get-export-data")]
-    [ProducesResponseType(typeof(List<Dictionary<string, object>>), (int)HttpStatusCode.OK)]
-    public async Task<ActionResult> GetExportData(DateTime? start, DateTime? end, List<string> selectedFields)
-    {
-        var response = await _supplierService.GetExportData(start, end, selectedFields);
-        return Ok(response);
-    }
+    // [HttpPost, Route("get-export-data")]
+    // [ProducesResponseType(typeof(List<Dictionary<string, object>>), (int)HttpStatusCode.OK)]
+    // public async Task<ActionResult> GetExportData(DateTime? start, DateTime? end, List<string> selectedFields)
+    // {
+    //     var response = await _supplierService.GetExportData(start, end, selectedFields);
+    //     return Ok(response);
+    // }
 
     [HttpGet, Route("getbyid/{id}")]
     public async Task<ActionResult> GetById(Guid id)
@@ -82,10 +82,10 @@ public class SuppliersController : ControllerBase
         return Ok(response);
     }
 
-    [HttpGet, Route("get-form")]
-    public async Task<IActionResult> GetForm()
-    {
-        var form = await _supplierService.GetForm();
-        return Ok(form);
-    }
+    // [HttpGet, Route("get-form")]
+    // public async Task<IActionResult> GetForm()
+    // {
+    //     var form = await _supplierService.GetForm();
+    //     return Ok(form);
+    // }
 }

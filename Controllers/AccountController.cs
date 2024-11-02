@@ -21,12 +21,12 @@ public class AccountController : ControllerBase
     [AllowAnonymous]
     [HttpPost]
     [Route("register")]
-    [ProducesResponseType(typeof(ResponseDto), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(ResponseDto<RegisterDto>), (int)HttpStatusCode.OK)]
     public async Task<ActionResult> Register(RegisterDto registerDto)
     {
         if (!ModelState.IsValid)
         {
-            return BadRequest(new ResponseDto
+            return BadRequest(new ResponseDto<RegisterDto>
             {
                 IsSuccess = false,
                 Message = "Invalid data."
@@ -41,9 +41,9 @@ public class AccountController : ControllerBase
     [AllowAnonymous]
     [HttpPost]
     [Route("login")]
-    [ProducesResponseType(typeof(ResponseDto), (int)HttpStatusCode.OK)]
-    [ProducesResponseType(typeof(ResponseDto), (int)HttpStatusCode.Unauthorized)]
-    public async Task<ActionResult<ResponseDto>> Login(LoginDto loginDto)
+    [ProducesResponseType(typeof(ResponseDto<LoginDto>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(ResponseDto<LoginDto>), (int)HttpStatusCode.Unauthorized)]
+    public async Task<ActionResult<ResponseDto<LoginDto>>> Login(LoginDto loginDto)
     {
         var response = await _accountService.Login(loginDto);
 
@@ -57,7 +57,7 @@ public class AccountController : ControllerBase
     public async Task<ActionResult<UserDetailDto>> GetUserDetail()
     {
         var response = await _accountService.GetUserDetail();
-        return response;
+        return Ok(response);
     }
 
     [HttpGet, Route("get")]

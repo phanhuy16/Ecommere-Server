@@ -19,7 +19,7 @@ public class PromotionController : ControllerBase
         _promotionService = promotionService;
     }
 
-    [Authorize]
+    // [Authorize]
     [HttpPost, Route("add-new")]
     [ProducesResponseType(typeof(Response<Promotion>), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(Response<Promotion>), (int)HttpStatusCode.BadRequest)]
@@ -38,7 +38,7 @@ public class PromotionController : ControllerBase
         return Ok(response);
     }
 
-    [Authorize]
+    // [Authorize]
     [HttpPut, Route("update")]
     [ProducesResponseType(typeof(List<Response<Promotion>>), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(Response<Promotion>), (int)HttpStatusCode.BadRequest)]
@@ -48,7 +48,7 @@ public class PromotionController : ControllerBase
         return Ok(response);
     }
 
-    [Authorize]
+    // [Authorize]
     [HttpDelete, Route("delete")]
     [ProducesResponseType(typeof(Response<Product>), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(Response<Product>), (int)HttpStatusCode.BadRequest)]
