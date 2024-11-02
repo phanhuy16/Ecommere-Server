@@ -7,7 +7,6 @@ using Server.Contracts;
 using Server.Data;
 using Server.Entities;
 using Server.Helper;
-using Server.Utilities.Form;
 using Server.Utilities.Pagination;
 using Server.Utilities.Response;
 
@@ -288,63 +287,6 @@ public class SupplierService : ISupplier
             }
         }
     }
-    // public async Task<List<Dictionary<string, object>>> GetExportData(DateTime? start, DateTime? end, List<string> selectedFields)
-    // {
-    //     try
-    //     {
-    //         var query = from sup in _context.Suppliers
-    //                     where (!start.HasValue || sup.created_at >= start.Value)
-    //                     && (!end.HasValue || sup.created_at <= end.Value)
-    //                     select new
-    //                     {
-    //                         sup,
-    //                         Category = sup.category
-    //                     };
-
-    //         var suppliers = await query.ToListAsync();
-
-    //         var result = new List<Dictionary<string, object>>();
-
-    //         foreach (var item in suppliers)
-    //         {
-    //             var dict = new Dictionary<string, object>();
-
-    //             var supplier = item.sup;
-
-    //             // Add only the selected fields to the dictionary
-    //             if (selectedFields.Contains("id")) dict["id"] = supplier.id;
-    //             if (selectedFields.Contains("name")) dict["name"] = supplier.name;
-    //             if (selectedFields.Contains("product")) dict["product"] = supplier.product;
-    //             if (selectedFields.Contains("price")) dict["price"] = supplier.price;
-    //             if (selectedFields.Contains("slug")) dict["slug"] = supplier.slug;
-    //             if (selectedFields.Contains("contact")) dict["contact"] = supplier.contact;
-    //             if (selectedFields.Contains("isTaking")) dict["isTaking"] = supplier.isTalking;
-    //             if (selectedFields.Contains("email")) dict["email"] = supplier.email;
-    //             if (selectedFields.Contains("active")) dict["active"] = supplier.active;
-    //             if (selectedFields.Contains("photoUrl")) dict["photoUrl"] = supplier.photoUrl;
-    //             if (selectedFields.Contains("created_at")) dict["created_at"] = supplier.created_at;
-    //             if (selectedFields.Contains("updated_at")) dict["updated_at"] = supplier.updated_at;
-
-    //             if (selectedFields.Contains("category") && supplier.category != null)
-    //             {
-    //                 var categoryData = new Dictionary<string, object>();
-    //                 if (selectedFields.Contains("category_id")) categoryData["category_Id"] = supplier.category.Id;
-    //                 // if (selectedFields.Contains("Category_Title")) categoryData["Category_Title"] = supplier.category.Category_Title;
-
-    //                 dict["category"] = categoryData;
-    //             }
-
-    //             result.Add(dict);
-    //         }
-
-    //         return result;
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         throw new Exception(ex.ToString());
-    //     }
-    // }
-
     public async Task<Response<Supplier>> GetById(Guid SupplierId)
     {
         using (var transaction = await _context.Database.BeginTransactionAsync())
@@ -403,22 +345,4 @@ public class SupplierService : ISupplier
             }
         }
     }
-
-    // public async Task<IActionResult> GetForm()
-    // {
-    //     var formConfig = new FormConfig
-    //     {
-    //         Title = "Supplier",
-    //         Layout = "horizontal",
-    //         LabelCol = 6,
-    //         WrapperCol = 18,
-    //         FormItem = Forms.GetFormFields()
-    //     };
-    //     var result = new
-    //     {
-    //         form = formConfig
-    //     };
-
-    //     return await Task.FromResult(new OkObjectResult(result));
-    // }
 }

@@ -13,6 +13,4 @@ public interface ISupplier
     Task<Response<Supplier>> Post(Supplier sup);
     Task<Response<Supplier>> Update(Supplier sup, Guid SupplierId);
     Task<Response<Supplier>> Delete(Guid SupplierId);
-    // Task<IActionResult> GetForm();
-    // Task<List<Dictionary<string, object>>> GetExportData(DateTime? start, DateTime? end, List<string> selectedFields);
 }
