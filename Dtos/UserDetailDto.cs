@@ -2,7 +2,7 @@
 
 namespace Server.Dtos;
 
-public class UserDetailDto
+public class UserDetailDTO
 {
     public string? Id { get; set; }
     public string? FullName { get; set; }

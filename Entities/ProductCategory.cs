@@ -12,10 +12,10 @@ public class ProductCategory
     public Guid? ProductId { get; set; }
 
     [JsonIgnore]
-    public Product Product { get; set; } = null!;
+    public Product? Product { get; set; } = null!;
     [Key]
     public Guid? CategoryId { get; set; }
 
     [JsonIgnore]
-    public Category Category { get; set; } = null!;
+    public Category? Category { get; set; } = null!;
 }

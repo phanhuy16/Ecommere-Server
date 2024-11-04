@@ -12,7 +12,7 @@ using Server.Data;
 namespace Server.Data.Migrations
 {
     [DbContext(typeof(EFDataContext))]
-    [Migration("20241102024237_InitialMigration")]
+    [Migration("20241103075128_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -54,13 +54,13 @@ namespace Server.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "7c66dac1-813c-4186-be9f-27665baa93d2",
+                            Id = "22bac416-cc59-482c-b642-79036b4b196c",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
-                            Id = "7edd86f8-910b-4d52-8421-1efddffd909a",
+                            Id = "f6365716-bc32-4315-911a-dd0cd254bac2",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         });
@@ -379,6 +379,43 @@ namespace Server.Data.Migrations
                     b.ToTable("Promotions");
                 });
 
+            modelBuilder.Entity("Server.Entities.RefreshToken", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("AddedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ExpiryDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsRevorked")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsUesd")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("JwtId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RefreshTokens");
+                });
+
             modelBuilder.Entity("Server.Entities.SubProduct", b =>
                 {
                     b.Property<Guid>("Id")
@@ -498,15 +535,6 @@ namespace Server.Data.Migrations
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
-
-                    b.Property<string>("FisrtName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FullName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("LastName")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -655,6 +683,17 @@ namespace Server.Data.Migrations
                     b.Navigation("Category");
 
                     b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("Server.Entities.RefreshToken", b =>
+                {
+                    b.HasOne("Server.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Server.Entities.SubProduct", b =>

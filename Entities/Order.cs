@@ -12,5 +12,5 @@ public class Order
     public int Total { get; set; }
 
     [JsonIgnore]
-    public virtual ICollection<SubProduct> SubProducts { get; set; } = null!;
+    public virtual ICollection<SubProduct>? SubProducts { get; set; } = null!;
 }

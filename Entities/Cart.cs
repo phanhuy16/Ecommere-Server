@@ -19,7 +19,7 @@ public class Cart
     public Guid ProductId { get; set; }
 
     [JsonIgnore]
-    public virtual SubProduct SubProduct { get; set; } = null!;
+    public virtual SubProduct? SubProduct { get; set; } = null!;
     [JsonIgnore]
-    public virtual Product Products { get; set; } = null!;
+    public virtual Product? Products { get; set; } = null!;
 }

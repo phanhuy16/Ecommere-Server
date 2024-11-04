@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Server.Contracts;
 using Server.Dtos;
+using Server.Dtos.Requests;
 
 namespace Server.Controllers;
 
@@ -13,6 +14,7 @@ namespace Server.Controllers;
 public class AccountController : ControllerBase
 {
     private readonly IAccount _accountService;
+
     public AccountController(IAccount accountService)
     {
         _accountService = accountService;
@@ -21,19 +23,19 @@ public class AccountController : ControllerBase
     [AllowAnonymous]
     [HttpPost]
     [Route("register")]
-    [ProducesResponseType(typeof(ResponseDto<RegisterDto>), (int)HttpStatusCode.OK)]
-    public async Task<ActionResult> Register(RegisterDto registerDto)
+    [ProducesResponseType(typeof(ResponseDTO), (int)HttpStatusCode.OK)]
+    public async Task<ActionResult> Register(Register register)
     {
         if (!ModelState.IsValid)
         {
-            return BadRequest(new ResponseDto<RegisterDto>
+            return BadRequest(new ResponseDTO
             {
                 IsSuccess = false,
                 Message = "Invalid data."
             });
         }
 
-        var response = await _accountService.Register(registerDto);
+        var response = await _accountService.Register(register);
 
         return Ok(response);
     }
@@ -41,11 +43,42 @@ public class AccountController : ControllerBase
     [AllowAnonymous]
     [HttpPost]
     [Route("login")]
-    [ProducesResponseType(typeof(ResponseDto<LoginDto>), (int)HttpStatusCode.OK)]
-    [ProducesResponseType(typeof(ResponseDto<LoginDto>), (int)HttpStatusCode.Unauthorized)]
-    public async Task<ActionResult<ResponseDto<LoginDto>>> Login(LoginDto loginDto)
+    [ProducesResponseType(typeof(ResponseDTO), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(ResponseDTO), (int)HttpStatusCode.Unauthorized)]
+    public async Task<ActionResult<ResponseDTO>> Login(Login login)
     {
-        var response = await _accountService.Login(loginDto);
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(new ResponseDTO
+            {
+                IsSuccess = false,
+                Message = "Invalid data."
+            });
+        }
+
+        var response = await _accountService.Login(login);
+
+        return Ok(response);
+
+    }
+
+    [AllowAnonymous]
+    [HttpPost]
+    [Route("refreshtoken")]
+    [ProducesResponseType(typeof(ResponseDTO), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(ResponseDTO), (int)HttpStatusCode.Unauthorized)]
+    public async Task<ActionResult<ResponseDTO>> RefreshToken(TokenRequest tokenRequest)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(new ResponseDTO
+            {
+                IsSuccess = false,
+                Message = "Invalid data."
+            });
+        }
+
+        var response = await _accountService.RefreshToken(tokenRequest);
 
         return Ok(response);
 
@@ -53,16 +86,16 @@ public class AccountController : ControllerBase
 
     [HttpGet]
     [HttpGet, Route("detail")]
-    [ProducesResponseType(typeof(UserDetailDto), (int)HttpStatusCode.OK)]
-    public async Task<ActionResult<UserDetailDto>> GetUserDetail()
+    [ProducesResponseType(typeof(UserDetailDTO), (int)HttpStatusCode.OK)]
+    public async Task<ActionResult<UserDetailDTO>> GetUserDetail()
     {
         var response = await _accountService.GetUserDetail();
         return Ok(response);
     }
 
     [HttpGet, Route("get")]
-    [ProducesResponseType(typeof(UserDetailDto), (int)HttpStatusCode.OK)]
-    public async Task<ActionResult<IEnumerable<UserDetailDto>>> GetUsers()
+    [ProducesResponseType(typeof(UserDetailDTO), (int)HttpStatusCode.OK)]
+    public async Task<ActionResult<IEnumerable<UserDetailDTO>>> GetUsers()
     {
         var response = await _accountService.GetUsers();
         return response;

@@ -1,16 +1,19 @@
 using Microsoft.AspNetCore.Mvc;
 using Server.Dtos;
+using Server.Dtos.Requests;
+using Server.Utilities.Response;
 
 namespace Server.Contracts;
 
 
 public interface IAccount
 {
-    Task<ResponseDto<RegisterDto>> Register(RegisterDto registerDto);
+    Task<Response<object>> Register(Register register);
 
-    Task<ResponseDto<LoginDto>> Login(LoginDto loginDto);
+    Task<Response<object>> Login(Login login);
+    Task<ResponseDTO> RefreshToken(TokenRequest tokenRequest);
 
-    Task<ResponseDto<UserDetailDto>> GetUserDetail();
+    Task<ResponseDTO> GetUserDetail();
 
-    Task<ActionResult<IEnumerable<UserDetailDto>>> GetUsers();
+    Task<ActionResult<IEnumerable<UserDetailDTO>>> GetUsers();
 }

@@ -25,7 +25,7 @@ builder.Services.AddScoped<IOrder, OrderService>();
 builder.Services.AddScoped<IAccount, AccountService>();
 builder.Services.AddScoped<IRole, RoleService>();
 builder.Services.AddScoped<ISupplier, SupplierService>();
-builder.Services.AddScoped<ICustomer, CustomerService>();
+// builder.Services.AddScoped<ICustomer, CustomerService>();
 builder.Services.AddScoped<IPromotion, PromotionService>();
 
 // Helper
@@ -44,6 +44,8 @@ builder.Services.AddAuthorization();
 // Configure Identity and Authentication
 builder.Services.AddIdentity<User, IdentityRole>()
                 .AddEntityFrameworkStores<EFDataContext>()
+                .AddSignInManager()
+                .AddRoles<IdentityRole>()
                 .AddDefaultTokenProviders();
 
 builder.Services.AddIdentityCore<User>(options =>
@@ -73,6 +75,20 @@ builder.Services.AddIdentityCore<User>(options =>
 
 }).AddEntityFrameworkStores<EFDataContext>().AddDefaultTokenProviders();
 
+var tokenValidationParams = new TokenValidationParameters
+{
+    ValidateIssuer = true,
+    ValidateAudience = true,
+    ValidateLifetime = false,
+    ValidateIssuerSigningKey = true,
+    ValidIssuer = Jwt["Issuer"],
+    ValidAudience = Jwt["Audience"],
+    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Jwt.GetSection("SecurityKey").Value!)),
+    ClockSkew = TimeSpan.Zero
+};
+
+builder.Services.AddSingleton(tokenValidationParams);
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -80,17 +96,8 @@ builder.Services.AddAuthentication(options =>
     options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
 }).AddJwtBearer(options =>
 {
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = Jwt["Issuer"],
-        ValidAudience = Jwt["Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Jwt.GetSection("SecurityKey").Value!)),
-        ClockSkew = TimeSpan.Zero
-    };
+    options.SaveToken = true;
+    options.TokenValidationParameters = tokenValidationParams;
 
     options.Events = new JwtBearerEvents
     {
@@ -109,11 +116,12 @@ builder.Services.AddSwaggerGen(c =>
 
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        Description = "JWT Authorization header using the Bearer scheme. Example: \"Bearer {token}\"",
-        Name = "Authorization",
         In = ParameterLocation.Header,
-        Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer"
+        Description = "Please enter token",
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        BearerFormat = "JWT",
+        Scheme = "bearer"
     });
 
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -123,14 +131,11 @@ builder.Services.AddSwaggerGen(c =>
             {
                 Reference = new OpenApiReference
                 {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                },
-                Scheme = "outh2",
-                Name ="Bearer",
-                In = ParameterLocation.Header
+                    Type=ReferenceType.SecurityScheme,
+                    Id="Bearer"
+                }
             },
-            new List<string>()
+            new string[]{}
         }
     });
 

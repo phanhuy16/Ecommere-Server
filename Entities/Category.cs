@@ -15,9 +15,9 @@ public class Category
     public DateTime? UpdatedAt { get; set; }
 
     [JsonIgnore]
-    public ICollection<Category> SubCategories { get; set; } = null!;
+    public ICollection<Category>? SubCategories { get; set; } = null!;
     [JsonIgnore]
-    public virtual ICollection<ProductCategory> ProductCategories { get; set; } = null!;
+    public virtual ICollection<ProductCategory>? ProductCategories { get; set; } = null!;
     [JsonIgnore]
-    public virtual ICollection<Supplier> Suppliers { get; set; } = null!;
+    public virtual ICollection<Supplier>? Suppliers { get; set; } = null!;
 }

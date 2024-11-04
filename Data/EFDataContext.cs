@@ -9,14 +9,17 @@ public partial class EFDataContext : IdentityDbContext<User>
 {
     public EFDataContext() { }
     public EFDataContext(DbContextOptions<EFDataContext> options) : base(options) { }
-    public DbSet<Product> Products { get; set; } = null!;
-    public DbSet<SubProduct> SubProducts { get; set; } = null!;
-    public DbSet<Category> Categories { get; set; } = null!;
-    public DbSet<ProductCategory> ProductCategories { get; set; } = null!;
-    public DbSet<Cart> Carts { get; set; } = null!;
-    public DbSet<Order> Orders { get; set; } = null!;
-    public DbSet<Supplier> Suppliers { get; set; } = null!;
-    public DbSet<Promotion> Promotions { get; set; } = null!;
+    public virtual DbSet<Product> Products { get; set; } = null!;
+    public virtual DbSet<SubProduct> SubProducts { get; set; } = null!;
+    public virtual DbSet<Category> Categories { get; set; } = null!;
+    public virtual DbSet<ProductCategory> ProductCategories { get; set; } = null!;
+    public virtual DbSet<Cart> Carts { get; set; } = null!;
+    public virtual DbSet<Order> Orders { get; set; } = null!;
+    public virtual DbSet<Supplier> Suppliers { get; set; } = null!;
+    public virtual DbSet<Promotion> Promotions { get; set; } = null!;
+    public virtual DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
+
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         foreach (var property in modelBuilder.Model.GetEntityTypes()
