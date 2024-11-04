@@ -9,6 +9,7 @@ using Server.Utilities.Response;
 
 namespace Server.Controllers;
 
+[Authorize(Roles = "User, AppUser")]
 [ApiController]
 [Route("api/[controller]")]
 public class CategoriesController : ControllerBase

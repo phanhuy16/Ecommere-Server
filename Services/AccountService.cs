@@ -23,7 +23,8 @@ public class AccountService : IAccount
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly EFDataContext _context;
     private readonly TokenValidationParameters _tokenValidationParameters;
-    public AccountService(UserManager<User> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, EFDataContext context, TokenValidationParameters tokenValidationParameters)
+    private readonly ILogger<AccountService> _logger;
+    public AccountService(UserManager<User> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, EFDataContext context, TokenValidationParameters tokenValidationParameters, ILogger<AccountService> logger)
     {
         _userManager = userManager;
         _roleManager = roleManager;
@@ -31,6 +32,7 @@ public class AccountService : IAccount
         _httpContextAccessor = httpContextAccessor;
         _context = context;
         _tokenValidationParameters = tokenValidationParameters;
+        _logger = logger;
     }
 
     public async Task<Response<object>> Register(Register register)
@@ -77,18 +79,8 @@ public class AccountService : IAccount
             };
         }
 
-        if (register.Roles == null)
-        {
-            await _userManager.AddToRoleAsync(user, "Admin");
-        }
-        else
-        {
-            foreach (var role in register.Roles)
-            {
-                await _userManager.AddToRoleAsync(user, role);
-            }
-        }
-
+        // We need to add the user to a role
+        await _userManager.AddToRoleAsync(user, "User");
 
         var token = await GenerateToken(user);
 
@@ -96,7 +88,9 @@ public class AccountService : IAccount
         return new Response<object>
         {
             Message = "Registration successful.",
-            Data = new { token }
+            Data = token,
+            HttpStatusCode = HttpStatusCode.OK,
+            IsSuccess = true,
         };
     }
 
@@ -131,7 +125,9 @@ public class AccountService : IAccount
         return new Response<object>
         {
             Message = "Login successful.",
-            Data = new { token }
+            Data = token,
+            HttpStatusCode = HttpStatusCode.OK,
+            IsSuccess = true,
         };
     }
 
@@ -159,20 +155,7 @@ public class AccountService : IAccount
 
         var key = Encoding.ASCII.GetBytes(_configuration.GetSection("Jwt").GetSection("SecurityKey").Value!);
 
-        var roles = _userManager.GetRolesAsync(user).Result;
-
-        List<Claim> claims = [
-            new (JwtRegisteredClaimNames.Email, user.Email ?? ""),
-            new (JwtRegisteredClaimNames.NameId,user.Id),
-            new (JwtRegisteredClaimNames.Sub,user.Email ?? ""),
-            new(JwtRegisteredClaimNames.Aud, _configuration.GetSection("Jwt").GetSection("Audience").Value!), new (JwtRegisteredClaimNames.Iss, _configuration.GetSection("Jwt").GetSection("Issuer").Value!),
-            new (JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-        ];
-
-        foreach (var role in roles)
-        {
-            claims.Add(new Claim(ClaimTypes.Role, role));
-        }
+        var claims = await GetAllValdClaims(user);
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {
@@ -182,9 +165,6 @@ public class AccountService : IAccount
         };
 
         var token = tokenHandler.CreateToken(tokenDescriptor);
-
-        Console.WriteLine($"Tokennnn: {token.Id}");
-
 
         var jwtToken = tokenHandler.WriteToken(token);
 
@@ -209,6 +189,44 @@ public class AccountService : IAccount
             IsSuccess = true,
             HttpStatusCode = HttpStatusCode.OK
         };
+    }
+
+    // Get all valid claims for the corresponding user
+    private async Task<List<Claim>> GetAllValdClaims(User user)
+    {
+        var claims = new List<Claim>()
+        {
+            new (JwtRegisteredClaimNames.Email, user.Email ?? ""),
+            new (JwtRegisteredClaimNames.NameId,user.Id),
+            new (JwtRegisteredClaimNames.Sub,user.Email ?? ""),
+            new(JwtRegisteredClaimNames.Aud, _configuration.GetSection("Jwt").GetSection("Audience").Value!), new (JwtRegisteredClaimNames.Iss, _configuration.GetSection("Jwt").GetSection("Issuer").Value!),
+            new (JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+        };
+
+        // Getting the claims that we have assigned to the user
+        var userClaims = await _userManager.GetClaimsAsync(user);
+        claims.AddRange(userClaims);
+
+        // Get the user role and add it to the claims
+        var userRoles = await _userManager.GetRolesAsync(user);
+
+        foreach (var userRole in userRoles)
+        {
+            var role = await _roleManager.FindByNameAsync(userRole);
+
+            if (role != null)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, userRole));
+
+                var roleClaims = await _roleManager.GetClaimsAsync(role);
+                foreach (var roleClaim in roleClaims)
+                {
+                    claims.Add(roleClaim);
+                }
+            }
+        }
+
+        return claims;
     }
 
     private async Task<ResponseDTO> VerifyAndGenerateToken(TokenRequest tokenRequest)

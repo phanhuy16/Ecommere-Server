@@ -23,11 +23,11 @@ builder.Services.AddScoped<IProduct, ProductService>();
 builder.Services.AddScoped<ICart, CartService>();
 builder.Services.AddScoped<IOrder, OrderService>();
 builder.Services.AddScoped<IAccount, AccountService>();
-builder.Services.AddScoped<IRole, RoleService>();
+builder.Services.AddScoped<ISetUp, SetupService>();
 builder.Services.AddScoped<ISupplier, SupplierService>();
-// builder.Services.AddScoped<ICustomer, CustomerService>();
 builder.Services.AddScoped<IPromotion, PromotionService>();
 
+builder.Services.AddScoped<IClaimsSetup, ClaimsSetupService>();
 // Helper
 builder.Services.Configure<ApplicationSettings>(builder.Configuration.GetSection("HRConnectString"));
 builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
@@ -39,7 +39,11 @@ builder.Services.AddDbContext<EFDataContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("HRConnectString"))
 );
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("DepartmentPolicy",
+    policy => policy.RequireClaim("department"));
+});
 
 // Configure Identity and Authentication
 builder.Services.AddIdentity<User, IdentityRole>()
@@ -145,7 +149,7 @@ builder.Services.AddSwaggerGen(c =>
 // Configure CORS
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("CorsPolicy", builder =>
+    options.AddPolicy("Open", builder =>
     {
         builder.WithOrigins("http://localhost:5173", "http://localhost:5174")
             .AllowAnyMethod()
@@ -188,7 +192,7 @@ else
 }
 
 
-app.UseCors("CorsPolicy");
+app.UseCors("Open");
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
