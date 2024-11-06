@@ -15,7 +15,7 @@ public class Supplier
     public bool? IsTalking { get; set; } = false;
     public string? Email { get; set; } = string.Empty;
     public int Active { get; set; }
-    public string? Imgae { get; set; } = string.Empty;
+    public string? Image { get; set; } = string.Empty;
     public DateTime? CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
 

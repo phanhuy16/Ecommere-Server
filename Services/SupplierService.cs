@@ -45,7 +45,7 @@ public class SupplierService : ISupplier
                     IsTalking = sup.IsTalking,
                     Email = sup.Email,
                     Active = sup.Active,
-                    Imgae = sup.Imgae,
+                    Image = sup.Image,
                     CreatedAt = DateTime.UtcNow,
                     Product = sup.Product,
                     Categories = categories,
@@ -114,7 +114,7 @@ public class SupplierService : ISupplier
                 supplier.IsTalking = sup.IsTalking;
                 supplier.Email = sup.Email;
                 supplier.Active = sup.Active;
-                supplier.Imgae = sup.Imgae;
+                supplier.Image = sup.Image;
                 supplier.UpdatedAt = DateTime.UtcNow;
                 supplier.Product = sup.Product;
                 supplier.Categories = sup.Categories;
@@ -221,7 +221,7 @@ public class SupplierService : ISupplier
                                     IsTalking = sup.IsTalking,
                                     Email = sup.Email,
                                     Active = sup.Active,
-                                    Imgae = sup.Imgae,
+                                    Image = sup.Image,
                                     Product = sup.Product,
                                     CreatedAt = DateTime.UtcNow,
                                     UpdatedAt = DateTime.UtcNow,
@@ -264,7 +264,7 @@ public class SupplierService : ISupplier
                                     IsTalking = sup.IsTalking,
                                     Email = sup.Email,
                                     Active = sup.Active,
-                                    Imgae = sup.Imgae,
+                                    Image = sup.Image,
                                     Product = sup.Product,
                                     CreatedAt = DateTime.UtcNow,
                                     UpdatedAt = DateTime.UtcNow,
@@ -324,7 +324,7 @@ public class SupplierService : ISupplier
                                     Email = sup.Email,
                                     Active = sup.Active,
                                     Product = sup.Product,
-                                    Imgae = sup.Imgae,
+                                    Image = sup.Image,
                                     CreatedAt = DateTime.UtcNow,
                                     UpdatedAt = DateTime.UtcNow,
                                     Categories = sup.Categories,
