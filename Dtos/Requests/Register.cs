@@ -1,7 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
 namespace Server.Dtos.Requests;
-
 public class Register
 {
     [Required]

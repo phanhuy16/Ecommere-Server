@@ -25,5 +25,5 @@ public class SubProduct
     [JsonIgnore]
     public virtual Product? Product { get; set; } = null!;
     [JsonIgnore]
-    public virtual ICollection<Cart>? Carts { get; set; } = null!;
+    public virtual ICollection<Cart> Carts { get; set; } = new List<Cart>();
 }

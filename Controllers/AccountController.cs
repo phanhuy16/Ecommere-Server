@@ -83,21 +83,4 @@ public class AccountController : ControllerBase
         return Ok(response);
 
     }
-
-    [HttpGet]
-    [HttpGet, Route("detail")]
-    [ProducesResponseType(typeof(UserDetailDTO), (int)HttpStatusCode.OK)]
-    public async Task<ActionResult<UserDetailDTO>> GetUserDetail()
-    {
-        var response = await _accountService.GetUserDetail();
-        return Ok(response);
-    }
-
-    [HttpGet, Route("get")]
-    [ProducesResponseType(typeof(UserDetailDTO), (int)HttpStatusCode.OK)]
-    public async Task<ActionResult<IEnumerable<UserDetailDTO>>> GetUsers()
-    {
-        var response = await _accountService.GetUsers();
-        return response;
-    }
 }

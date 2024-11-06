@@ -9,7 +9,6 @@ using Server.Utilities.Response;
 
 namespace Server.Controllers;
 
-[Authorize(Roles = "User, AppUser")]
 [ApiController]
 [Route("api/[controller]")]
 public class CategoriesController : ControllerBase
@@ -19,6 +18,8 @@ public class CategoriesController : ControllerBase
     {
         _categoryService = categoryService;
     }
+
+    // [Authorize(Roles = "User")]
 
     [HttpGet, Route("get-all")]
     [ProducesResponseType(typeof(List<Category>), (int)HttpStatusCode.OK)]
@@ -39,14 +40,15 @@ public class CategoriesController : ControllerBase
         return Ok(response);
     }
 
-    [HttpGet, Route("get-by-id/{id}")]
-    public async Task<ActionResult> GetById(Guid id)
+    [HttpGet, Route("get-by-id")]
+    public async Task<ActionResult> GetById([FromQuery] Guid id)
     {
         var response = await _categoryService.GetById(id);
         return Ok(response);
     }
 
-    // [Authorize]
+    [Authorize(Roles = "Admin")]
+
     [HttpPost]
     [Route("add-new")]
     [ProducesResponseType(typeof(Response<Category>), (int)HttpStatusCode.OK)]
@@ -69,11 +71,10 @@ public class CategoriesController : ControllerBase
         return BadRequest(response);
     }
 
-    // [Authorize]
     [HttpDelete]
-    [Route("delete/{id}")]
+    [Route("delete")]
     [ProducesResponseType(typeof(Response<Category>), (int)HttpStatusCode.OK)]
-    public async Task<ActionResult> Delete(Guid id)
+    public async Task<ActionResult> Delete([FromQuery] Guid id)
     {
         var response = await _categoryService.Delete(id);
         if (response.IsSuccess)
@@ -83,11 +84,10 @@ public class CategoriesController : ControllerBase
         return BadRequest(response);
     }
 
-    // [Authorize]
-    [HttpPut, Route("update/{id}")]
+    [HttpPut, Route("update")]
     [ProducesResponseType(typeof(List<Response<Category>>), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(Response<Category>), (int)HttpStatusCode.BadRequest)]
-    public async Task<ActionResult> Update([FromBody] Category category, Guid id)
+    public async Task<ActionResult> Update([FromQuery] Category category, Guid id)
     {
         var response = await _categoryService.Update(category, id);
         if (response.IsSuccess)

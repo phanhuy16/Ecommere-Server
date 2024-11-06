@@ -9,7 +9,6 @@ using Server.Utilities.Response;
 
 namespace Server.Controllers;
 
-// [Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class SuppliersController : ControllerBase
@@ -19,6 +18,9 @@ public class SuppliersController : ControllerBase
     {
         _supplierService = supplierService;
     }
+
+
+    // [Authorize(Roles = "User")]
 
     [HttpGet, Route("get-all")]
     [ProducesResponseType(typeof(List<Supplier>), (int)HttpStatusCode.OK)]
@@ -39,20 +41,15 @@ public class SuppliersController : ControllerBase
 
     }
 
-    // [HttpPost, Route("get-export-data")]
-    // [ProducesResponseType(typeof(List<Dictionary<string, object>>), (int)HttpStatusCode.OK)]
-    // public async Task<ActionResult> GetExportData(DateTime? start, DateTime? end, List<string> selectedFields)
-    // {
-    //     var response = await _supplierService.GetExportData(start, end, selectedFields);
-    //     return Ok(response);
-    // }
-
-    [HttpGet, Route("getbyid/{id}")]
-    public async Task<ActionResult> GetById(Guid id)
+    [HttpGet, Route("getbyid")]
+    public async Task<ActionResult> GetById([FromQuery] Guid id)
     {
         var response = await _supplierService.GetById(id);
         return Ok(response);
     }
+
+
+    // [Authorize(Roles = "Admin")]
 
     [HttpPost, Route("add-new")]
     [ProducesResponseType(typeof(List<Response<Supplier>>), (int)HttpStatusCode.OK)]
@@ -64,28 +61,21 @@ public class SuppliersController : ControllerBase
         return Ok(response);
     }
 
-    [HttpPut, Route("update/{id}")]
+    [HttpPut, Route("update")]
     [ProducesResponseType(typeof(List<Response<Supplier>>), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(Response<Supplier>), (int)HttpStatusCode.BadRequest)]
-    public async Task<ActionResult> Update([FromBody] Supplier supplier, Guid id)
+    public async Task<ActionResult> Update([FromBody] Supplier supplier, [FromQuery] Guid id)
     {
         var response = await _supplierService.Update(supplier, id);
         return Ok(response);
     }
 
-    [HttpDelete, Route("delete/{id}")]
+    [HttpDelete, Route("delete")]
     [ProducesResponseType(typeof(Response<Supplier>), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(Response<Supplier>), (int)HttpStatusCode.BadRequest)]
-    public async Task<ActionResult> Delete(Guid id)
+    public async Task<ActionResult> Delete([FromQuery] Guid id)
     {
         var response = await _supplierService.Delete(id);
         return Ok(response);
     }
-
-    // [HttpGet, Route("get-form")]
-    // public async Task<IActionResult> GetForm()
-    // {
-    //     var form = await _supplierService.GetForm();
-    //     return Ok(form);
-    // }
 }

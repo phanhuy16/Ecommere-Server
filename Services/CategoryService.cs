@@ -39,16 +39,8 @@ public class CategoryService : ICategory
                         Description = cate.Description,
                         CreatedAt = cate.CreatedAt,
                         UpdatedAt = cate.UpdatedAt,
-                        SubCategories = cate.SubCategories.Select(sub => new Category
-                        {
-                            Id = sub.Id,
-                            Title = sub.Title,
-                            Slug = sub.Slug,
-                            ParentId = sub.ParentId,
-                            Description = sub.Description,
-                            CreatedAt = sub.CreatedAt,
-                            UpdatedAt = sub.UpdatedAt
-                        }).ToList()
+                        SubCategories = cate.SubCategories,
+                        Suppliers = cate.Suppliers
                     })
                     .OrderByDescending(x => x.Id)
                     .ToListAsync();
@@ -88,6 +80,7 @@ public class CategoryService : ICategory
 
                 var categories = await _context.Categories
                     .Include(c => c.SubCategories)  // Thêm Include để lấy các danh mục con
+                    .Include(sp => sp.Suppliers)
                     .Select(cate => new Category
                     {
                         Id = cate.Id,
@@ -97,16 +90,8 @@ public class CategoryService : ICategory
                         Description = cate.Description,
                         CreatedAt = cate.CreatedAt,
                         UpdatedAt = cate.UpdatedAt,
-                        SubCategories = cate.SubCategories.Select(sub => new Category
-                        {
-                            Id = sub.Id,
-                            Title = sub.Title,
-                            Slug = sub.Slug,
-                            ParentId = sub.ParentId,
-                            Description = sub.Description,
-                            CreatedAt = sub.CreatedAt,
-                            UpdatedAt = sub.UpdatedAt
-                        }).ToList()
+                        SubCategories = cate.SubCategories,
+                        Suppliers = cate.Suppliers
                     })
                     .OrderByDescending(x => x.Id)
                     .Skip((validFilter.PageNumber - 1) * validFilter.PageSize)
@@ -156,16 +141,8 @@ public class CategoryService : ICategory
                         Description = cate.Description,
                         CreatedAt = cate.CreatedAt,
                         UpdatedAt = cate.UpdatedAt,
-                        SubCategories = cate.SubCategories.Select(sub => new Category
-                        {
-                            Id = sub.Id,
-                            Title = sub.Title,
-                            Slug = sub.Slug,
-                            ParentId = sub.ParentId,
-                            Description = sub.Description,
-                            CreatedAt = sub.CreatedAt,
-                            UpdatedAt = sub.UpdatedAt
-                        }).ToList()
+                        SubCategories = cate.SubCategories,
+                        Suppliers = cate.Suppliers
                     })
                     .OrderByDescending(x => x.Id)
                     .FirstOrDefaultAsync();
@@ -298,7 +275,7 @@ public class CategoryService : ICategory
                     };
                 }
 
-                var category = _context.Categories.Include(c => c.ProductCategories).Include(c => c.SubCategories).Where(x => x.Id == CategoryId).FirstOrDefault();
+                var category = _context.Categories.Include(c => c.SubCategories).Where(x => x.Id == CategoryId).FirstOrDefault();
 
                 if (category == null)
                 {
@@ -321,9 +298,9 @@ public class CategoryService : ICategory
                 }
 
                 // Xóa tất cả các sản phẩm liên quan đến danh mục này (nếu cần)
-                if (category.ProductCategories != null && category.ProductCategories.Any())
+                if (category.Products != null && category.Products.Any())
                 {
-                    _context.ProductCategories.RemoveRange(category.ProductCategories);
+                    _context.Products.RemoveRange(category.Products);
                 }
 
                 // Xóa danh mục

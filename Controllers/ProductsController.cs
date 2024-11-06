@@ -20,6 +20,9 @@ public class ProductsController : ControllerBase
         _productService = productService;
     }
 
+
+    // [Authorize(Roles = "User")]
+
     [HttpGet, Route("get-all-values")]
     [ProducesResponseType(typeof(Response<Product>), (int)HttpStatusCode.OK)]
     public async Task<ActionResult> GetAllSubProducts()
@@ -64,6 +67,15 @@ public class ProductsController : ControllerBase
         return Ok(response);
     }
 
+    [HttpGet, Route("search")]
+    [ProducesResponseType(typeof(Response<Product>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(Response<Product>), (int)HttpStatusCode.BadRequest)]
+    public async Task<ActionResult<IEnumerable<Product>>> Search([FromQuery] string slug)
+    {
+        var response = await _productService.Search(slug);
+        return Ok(response);
+    }
+
     [HttpPost, Route("filter-product")]
     [ProducesResponseType(typeof(Response<Product>), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(Response<Product>), (int)HttpStatusCode.BadRequest)]
@@ -73,7 +85,9 @@ public class ProductsController : ControllerBase
         return Ok(response);
     }
 
-    // [Authorize]
+
+    [Authorize(Roles = "Admin")]
+
     [HttpPost, Route("add-new")]
     [ProducesResponseType(typeof(Response<Product>), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(Response<Product>), (int)HttpStatusCode.BadRequest)]
@@ -83,7 +97,6 @@ public class ProductsController : ControllerBase
         return Ok(response);
     }
 
-    // [Authorize]
     [HttpPost, Route("add-sub-product")]
     [ProducesResponseType(typeof(List<Response<SubProduct>>), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(Response<SubProduct>), (int)HttpStatusCode.BadRequest)]
@@ -93,17 +106,15 @@ public class ProductsController : ControllerBase
         return Ok(response);
     }
 
-    // [Authorize]
-    [HttpPut, Route("update/{id}")]
+    [HttpPut, Route("update")]
     [ProducesResponseType(typeof(List<Response<Product>>), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(Response<Product>), (int)HttpStatusCode.BadRequest)]
-    public async Task<ActionResult> Update([FromBody] Product product, Guid id)
+    public async Task<ActionResult> Update([FromBody] Product product, [FromQuery] Guid id)
     {
         var response = await _productService.Update(product, id);
         return Ok(response);
     }
 
-    // [Authorize]
     [HttpPut, Route("update-sub-product")]
     [ProducesResponseType(typeof(List<Response<SubProduct>>), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(Response<SubProduct>), (int)HttpStatusCode.BadRequest)]
@@ -113,32 +124,21 @@ public class ProductsController : ControllerBase
         return Ok(response);
     }
 
-    // [Authorize]
-    [HttpDelete, Route("delete/{ProductId}")]
+    [HttpDelete, Route("delete")]
     [ProducesResponseType(typeof(Response<Product>), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(Response<Product>), (int)HttpStatusCode.BadRequest)]
-    public async Task<ActionResult> Delete(Guid ProductId)
+    public async Task<ActionResult> Delete([FromQuery] Guid ProductId)
     {
         var response = await _productService.Delete(ProductId);
         return Ok(response);
     }
 
-    // [Authorize]
     [HttpDelete, Route("delete-sub-product")]
     [ProducesResponseType(typeof(Response<SubProduct>), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(Response<SubProduct>), (int)HttpStatusCode.BadRequest)]
     public async Task<ActionResult> DeleteSubProduct([FromQuery] Guid id)
     {
         var response = await _productService.DeleteSubProduct(id);
-        return Ok(response);
-    }
-
-    [HttpGet, Route("{slug}")]
-    [ProducesResponseType(typeof(Response<Product>), (int)HttpStatusCode.OK)]
-    [ProducesResponseType(typeof(Response<Product>), (int)HttpStatusCode.BadRequest)]
-    public async Task<ActionResult<IEnumerable<Product>>> Search(string slug)
-    {
-        var response = await _productService.Search(slug);
         return Ok(response);
     }
 }

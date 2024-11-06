@@ -31,6 +31,11 @@ public class SupplierService : ISupplier
         {
             try
             {
+
+                var categories = await _context.Categories
+                .Where(p => sup.Categories.Select(sp => sp.Id).Contains(p.Id))
+                .ToListAsync();
+
                 var supplier = new Supplier()
                 {
                     Name = sup.Name,
@@ -42,8 +47,8 @@ public class SupplierService : ISupplier
                     Active = sup.Active,
                     Imgae = sup.Imgae,
                     CreatedAt = DateTime.UtcNow,
-                    CategoryId = sup.CategoryId,
-                    ProductId = sup.ProductId,
+                    Product = sup.Product,
+                    Categories = categories,
                 };
 
                 await _context.Suppliers.AddAsync(supplier);
@@ -111,8 +116,8 @@ public class SupplierService : ISupplier
                 supplier.Active = sup.Active;
                 supplier.Imgae = sup.Imgae;
                 supplier.UpdatedAt = DateTime.UtcNow;
-                supplier.CategoryId = sup.CategoryId;
-                supplier.ProductId = sup.ProductId;
+                supplier.Product = sup.Product;
+                supplier.Categories = sup.Categories;
 
                 _context.Suppliers.Update(supplier);
                 await _context.SaveChangesAsync();
@@ -205,26 +210,27 @@ public class SupplierService : ISupplier
                 var totalRecords = await _context.Suppliers.CountAsync();
 
                 var supplier = await _context.Suppliers
-                                        .Select(sup => new Supplier
-                                        {
-                                            Id = sup.Id,
-                                            Name = sup.Name,
-                                            Slug = sup.Slug,
-                                            Price = sup.Price,
-                                            Contact = sup.Contact,
-                                            IsTalking = sup.IsTalking,
-                                            Email = sup.Email,
-                                            Active = sup.Active,
-                                            Imgae = sup.Imgae,
-                                            CreatedAt = DateTime.UtcNow,
-                                            UpdatedAt = DateTime.UtcNow,
-                                            CategoryId = sup.CategoryId,
-                                            ProductId = sup.ProductId,
-                                        })
-                                        .OrderByDescending(x => x.Id)
-                                        .Skip((validFilter.PageNumber - 1) * validFilter.PageSize)
-                                        .Take(validFilter.PageSize)
-                                        .ToListAsync();
+                                .Include(c => c.Categories)
+                                .Select(sup => new Supplier
+                                {
+                                    Id = sup.Id,
+                                    Name = sup.Name,
+                                    Slug = sup.Slug,
+                                    Price = sup.Price,
+                                    Contact = sup.Contact,
+                                    IsTalking = sup.IsTalking,
+                                    Email = sup.Email,
+                                    Active = sup.Active,
+                                    Imgae = sup.Imgae,
+                                    Product = sup.Product,
+                                    CreatedAt = DateTime.UtcNow,
+                                    UpdatedAt = DateTime.UtcNow,
+                                    Categories = sup.Categories,
+                                })
+                                .OrderByDescending(x => x.Id)
+                                .Skip((validFilter.PageNumber - 1) * validFilter.PageSize)
+                                .Take(validFilter.PageSize)
+                                .ToListAsync();
 
                 var pagedResponse = PaginationHelper.CreatePagedReponse<Supplier>(supplier, validFilter, totalRecords, _uriService, route);
 
@@ -247,22 +253,23 @@ public class SupplierService : ISupplier
             try
             {
                 var supplier = await _context.Suppliers
-                                        .Select(sup => new Supplier
-                                        {
-                                            Id = sup.Id,
-                                            Name = sup.Name,
-                                            Slug = sup.Slug,
-                                            Price = sup.Price,
-                                            Contact = sup.Contact,
-                                            IsTalking = sup.IsTalking,
-                                            Email = sup.Email,
-                                            Active = sup.Active,
-                                            Imgae = sup.Imgae,
-                                            CreatedAt = DateTime.UtcNow,
-                                            UpdatedAt = DateTime.UtcNow,
-                                            CategoryId = sup.CategoryId,
-                                            ProductId = sup.ProductId,
-                                        }).OrderByDescending(x => x.Id).ToListAsync();
+                                .Include(c => c.Categories)
+                                .Select(sup => new Supplier
+                                {
+                                    Id = sup.Id,
+                                    Name = sup.Name,
+                                    Slug = sup.Slug,
+                                    Price = sup.Price,
+                                    Contact = sup.Contact,
+                                    IsTalking = sup.IsTalking,
+                                    Email = sup.Email,
+                                    Active = sup.Active,
+                                    Imgae = sup.Imgae,
+                                    Product = sup.Product,
+                                    CreatedAt = DateTime.UtcNow,
+                                    UpdatedAt = DateTime.UtcNow,
+                                    Categories = sup.Categories,
+                                }).OrderByDescending(x => x.Id).ToListAsync();
 
                 await transaction.CommitAsync();
 
@@ -305,22 +312,23 @@ public class SupplierService : ISupplier
                 }
 
                 var supplier = await _context.Suppliers
-                                        .Select(sup => new Supplier
-                                        {
-                                            Id = sup.Id,
-                                            Name = sup.Name,
-                                            Slug = sup.Slug,
-                                            Price = sup.Price,
-                                            Contact = sup.Contact,
-                                            IsTalking = sup.IsTalking,
-                                            Email = sup.Email,
-                                            Active = sup.Active,
-                                            Imgae = sup.Imgae,
-                                            CreatedAt = DateTime.UtcNow,
-                                            UpdatedAt = DateTime.UtcNow,
-                                            CategoryId = sup.CategoryId,
-                                            ProductId = sup.ProductId,
-                                        }).FirstOrDefaultAsync();
+                                .Include(c => c.Categories)
+                                .Select(sup => new Supplier
+                                {
+                                    Id = sup.Id,
+                                    Name = sup.Name,
+                                    Slug = sup.Slug,
+                                    Price = sup.Price,
+                                    Contact = sup.Contact,
+                                    IsTalking = sup.IsTalking,
+                                    Email = sup.Email,
+                                    Active = sup.Active,
+                                    Product = sup.Product,
+                                    Imgae = sup.Imgae,
+                                    CreatedAt = DateTime.UtcNow,
+                                    UpdatedAt = DateTime.UtcNow,
+                                    Categories = sup.Categories,
+                                }).FirstOrDefaultAsync();
 
                 await transaction.CommitAsync();
 

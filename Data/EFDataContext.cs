@@ -12,7 +12,6 @@ public partial class EFDataContext : IdentityDbContext<User>
     public virtual DbSet<Product> Products { get; set; } = null!;
     public virtual DbSet<SubProduct> SubProducts { get; set; } = null!;
     public virtual DbSet<Category> Categories { get; set; } = null!;
-    public virtual DbSet<ProductCategory> ProductCategories { get; set; } = null!;
     public virtual DbSet<Cart> Carts { get; set; } = null!;
     public virtual DbSet<Order> Orders { get; set; } = null!;
     public virtual DbSet<Supplier> Suppliers { get; set; } = null!;
@@ -37,9 +36,6 @@ public partial class EFDataContext : IdentityDbContext<User>
 
         modelBuilder.Entity<IdentityRole>().HasData(user);
         modelBuilder.Entity<IdentityRole>().HasData(admin);
-
-        // Cấu hình cho ProductCategory
-        modelBuilder.Entity<ProductCategory>().HasKey(pc => new { pc.ProductId, pc.CategoryId });
 
         // Cart
         modelBuilder.Entity<Cart>(entity =>

@@ -80,7 +80,17 @@ public class AccountService : IAccount
         }
 
         // We need to add the user to a role
-        await _userManager.AddToRoleAsync(user, "User");
+        if (register.Roles == null)
+        {
+            await _userManager.AddToRoleAsync(user, "User");
+        }
+        else
+        {
+            foreach (var role in register.Roles)
+            {
+                await _userManager.AddToRoleAsync(user, role);
+            }
+        }
 
         var token = await GenerateToken(user);
 
@@ -365,50 +375,5 @@ public class AccountService : IAccount
         var chars = "ABCDEFGHIJKLMNOPQRSTUVWYZ0123456789";
         return new string(Enumerable.Repeat(chars, length)
             .Select(x => x[random.Next(x.Length)]).ToArray());
-    }
-
-    public async Task<ResponseDTO> GetUserDetail()
-    {
-        var currentUserId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
-        var user = await _userManager.FindByIdAsync(currentUserId);
-
-        if (user is null)
-        {
-            return new ResponseDTO
-            {
-                IsSuccess = false,
-                Message = "User not found",
-                HttpStatusCode = HttpStatusCode.OK,
-            };
-        }
-
-        var userDetailDto = new UserDetailDTO
-        {
-            Id = user.Id,
-            Email = user.Email,
-            Roles = [.. await _userManager.GetRolesAsync(user)],
-            PhoneNumber = user.PhoneNumber,
-            PhoneNumberConfirmed = user.PhoneNumberConfirmed,
-            AccessFailedCount = user.AccessFailedCount,
-        };
-
-        return new ResponseDTO
-        {
-            IsSuccess = true,
-            Message = "User detail",
-            HttpStatusCode = HttpStatusCode.OK,
-        };
-    }
-
-    public async Task<ActionResult<IEnumerable<UserDetailDTO>>> GetUsers()
-    {
-        var users = await _userManager.Users.Select(u => new UserDetailDTO
-        {
-            Id = u.Id,
-            Email = u.Email,
-            Roles = _userManager.GetRolesAsync(u).Result.ToArray()
-        }).ToListAsync();
-
-        return new OkObjectResult(users);
     }
 }

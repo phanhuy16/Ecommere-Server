@@ -12,8 +12,4 @@ public interface IAccount
 
     Task<Response<object>> Login(Login login);
     Task<ResponseDTO> RefreshToken(TokenRequest tokenRequest);
-
-    Task<ResponseDTO> GetUserDetail();
-
-    Task<ActionResult<IEnumerable<UserDetailDTO>>> GetUsers();
 }

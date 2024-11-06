@@ -19,15 +19,8 @@ public class PromotionController : ControllerBase
         _promotionService = promotionService;
     }
 
-    // [Authorize]
-    [HttpPost, Route("add-new")]
-    [ProducesResponseType(typeof(Response<Promotion>), (int)HttpStatusCode.OK)]
-    [ProducesResponseType(typeof(Response<Promotion>), (int)HttpStatusCode.BadRequest)]
-    public async Task<ActionResult> AddPromotion([FromBody] Promotion promotion)
-    {
-        var response = await _promotionService.AddPromotion(promotion);
-        return Ok(response);
-    }
+
+    // [Authorize(Roles = "User")]
 
     [HttpGet, Route("get-all")]
     [ProducesResponseType(typeof(List<Promotion>), (int)HttpStatusCode.OK)]
@@ -38,7 +31,18 @@ public class PromotionController : ControllerBase
         return Ok(response);
     }
 
-    // [Authorize]
+    [HttpPost, Route("add-new")]
+    [ProducesResponseType(typeof(Response<Promotion>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(Response<Promotion>), (int)HttpStatusCode.BadRequest)]
+    public async Task<ActionResult> AddPromotion([FromBody] Promotion promotion)
+    {
+        var response = await _promotionService.AddPromotion(promotion);
+        return Ok(response);
+    }
+
+
+    [Authorize(Roles = "Admin")]
+
     [HttpPut, Route("update")]
     [ProducesResponseType(typeof(List<Response<Promotion>>), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(Response<Promotion>), (int)HttpStatusCode.BadRequest)]
@@ -48,7 +52,6 @@ public class PromotionController : ControllerBase
         return Ok(response);
     }
 
-    // [Authorize]
     [HttpDelete, Route("delete")]
     [ProducesResponseType(typeof(Response<Product>), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(Response<Product>), (int)HttpStatusCode.BadRequest)]

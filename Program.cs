@@ -41,8 +41,8 @@ builder.Services.AddDbContext<EFDataContext>(options =>
 
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("DepartmentPolicy",
-    policy => policy.RequireClaim("department"));
+    // options.AddPolicy("DepartmentPolicy",
+    // policy => policy.RequireClaim("department"));
 });
 
 // Configure Identity and Authentication
