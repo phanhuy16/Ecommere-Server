@@ -141,25 +141,25 @@ public class AccountService : IAccount
         };
     }
 
-    public async Task<ResponseDTO> RefreshToken(TokenRequest tokenRequest)
+    public async Task<IActionResult> RefreshToken(TokenRequest tokenRequest)
     {
 
         var result = await VerifyAndGenerateToken(tokenRequest);
 
         if (result == null)
         {
-            return new ResponseDTO
+            return new BadRequestObjectResult(new
             {
                 IsSuccess = false,
                 Message = "Invalid token",
                 HttpStatusCode = HttpStatusCode.BadRequest
-            };
+            });
         }
 
         return result;
     }
 
-    private async Task<ResponseDTO> GenerateToken(User user)
+    private async Task<IActionResult> GenerateToken(User user)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
 
@@ -192,13 +192,11 @@ public class AccountService : IAccount
         await _context.RefreshTokens.AddAsync(refreshToken);
         await _context.SaveChangesAsync();
 
-        return new ResponseDTO()
+        return new OkObjectResult(new
         {
-            Token = jwtToken,
-            RefreshToken = refreshToken.Token,
-            IsSuccess = true,
-            HttpStatusCode = HttpStatusCode.OK
-        };
+            AccessToken = jwtToken,
+            RefreshToken = refreshToken.Token
+        });
     }
 
     // Get all valid claims for the corresponding user
@@ -239,14 +237,14 @@ public class AccountService : IAccount
         return claims;
     }
 
-    private async Task<ResponseDTO> VerifyAndGenerateToken(TokenRequest tokenRequest)
+    private async Task<IActionResult> VerifyAndGenerateToken(TokenRequest tokenRequest)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
 
         try
         {
             // Validation 1 - validation jwt token format
-            var tokenInVerification = tokenHandler.ValidateToken(tokenRequest.Token, _tokenValidationParameters, out var validatedToken);
+            var tokenInVerification = tokenHandler.ValidateToken(tokenRequest.AccessToken, _tokenValidationParameters, out var validatedToken);
 
             // Validation 2 - validate encryption alg
             if (validatedToken is JwtSecurityToken jwtSecurityToken)
@@ -263,12 +261,12 @@ public class AccountService : IAccount
             var expClaim = tokenInVerification.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Exp);
             if (expClaim == null || string.IsNullOrEmpty(expClaim.Value))
             {
-                return new ResponseDTO()
+                return new BadRequestObjectResult(new
                 {
                     IsSuccess = false,
                     Message = "Token does not contain an expiry date",
                     HttpStatusCode = HttpStatusCode.BadRequest
-                };
+                });
             }
 
             var utcExpiryDate = long.Parse(expClaim.Value);
@@ -277,12 +275,12 @@ public class AccountService : IAccount
 
             if (expiryDate < DateTime.UtcNow)
             {
-                return new ResponseDTO()
+                return new BadRequestObjectResult(new
                 {
                     IsSuccess = false,
                     Message = "Token has not yet expired",
                     HttpStatusCode = HttpStatusCode.BadRequest
-                };
+                });
             }
 
             // Validation 4 - validate existence of the token 
@@ -290,34 +288,34 @@ public class AccountService : IAccount
 
             if (storedToken == null)
             {
-                return new ResponseDTO()
+                return new BadRequestObjectResult(new
                 {
                     IsSuccess = false,
                     Message = "Token do not exist",
                     HttpStatusCode = HttpStatusCode.BadRequest
-                };
+                });
             }
 
             // Validation 5 - validate if used
             if (storedToken.IsUesd)
             {
-                return new ResponseDTO()
+                return new BadRequestObjectResult(new
                 {
                     IsSuccess = false,
                     Message = "Token has been used",
                     HttpStatusCode = HttpStatusCode.BadRequest
-                };
+                });
             }
 
             // Validation 6 - validate if revoked
             if (storedToken.IsRevorked)
             {
-                return new ResponseDTO()
+                return new BadRequestObjectResult(new
                 {
                     IsSuccess = false,
                     Message = "Token has been revoked",
                     HttpStatusCode = HttpStatusCode.BadRequest
-                };
+                });
             }
 
 
@@ -325,24 +323,24 @@ public class AccountService : IAccount
             var jtiClaim = tokenInVerification.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Jti);
             if (jtiClaim == null || string.IsNullOrEmpty(jtiClaim.Value))
             {
-                return new ResponseDTO()
+                return new BadRequestObjectResult(new
                 {
                     IsSuccess = false,
                     Message = "Token does not contain a JTI",
                     HttpStatusCode = HttpStatusCode.BadRequest
-                };
+                });
             }
 
             var jti = jtiClaim.Value;
 
             if (storedToken.JwtId != jti)
             {
-                return new ResponseDTO()
+                return new BadRequestObjectResult(new
                 {
                     IsSuccess = false,
                     Message = "Token doesn't match",
                     HttpStatusCode = HttpStatusCode.BadRequest
-                };
+                });
             }
 
             // Update current token

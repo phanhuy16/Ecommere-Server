@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Server.Contracts;
 using Server.Dtos;
 using Server.Dtos.Requests;
+using Server.Utilities.Response;
 
 namespace Server.Controllers;
 
@@ -23,12 +24,12 @@ public class AccountController : ControllerBase
     [AllowAnonymous]
     [HttpPost]
     [Route("register")]
-    [ProducesResponseType(typeof(ResponseDTO), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(Response<object>), (int)HttpStatusCode.OK)]
     public async Task<ActionResult> Register(Register register)
     {
         if (!ModelState.IsValid)
         {
-            return BadRequest(new ResponseDTO
+            return BadRequest(new Response<object>
             {
                 IsSuccess = false,
                 Message = "Invalid data."
@@ -43,13 +44,13 @@ public class AccountController : ControllerBase
     [AllowAnonymous]
     [HttpPost]
     [Route("login")]
-    [ProducesResponseType(typeof(ResponseDTO), (int)HttpStatusCode.OK)]
-    [ProducesResponseType(typeof(ResponseDTO), (int)HttpStatusCode.Unauthorized)]
-    public async Task<ActionResult<ResponseDTO>> Login(Login login)
+    [ProducesResponseType(typeof(Response<object>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(Response<object>), (int)HttpStatusCode.Unauthorized)]
+    public async Task<ActionResult> Login(Login login)
     {
         if (!ModelState.IsValid)
         {
-            return BadRequest(new ResponseDTO
+            return BadRequest(new Response<object>
             {
                 IsSuccess = false,
                 Message = "Invalid data."
@@ -65,9 +66,9 @@ public class AccountController : ControllerBase
     [AllowAnonymous]
     [HttpPost]
     [Route("refreshtoken")]
-    [ProducesResponseType(typeof(ResponseDTO), (int)HttpStatusCode.OK)]
-    [ProducesResponseType(typeof(ResponseDTO), (int)HttpStatusCode.Unauthorized)]
-    public async Task<ActionResult<ResponseDTO>> RefreshToken(TokenRequest tokenRequest)
+    [ProducesResponseType(typeof(IActionResult), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(IActionResult), (int)HttpStatusCode.Unauthorized)]
+    public async Task<ActionResult> RefreshToken(TokenRequest tokenRequest)
     {
         if (!ModelState.IsValid)
         {

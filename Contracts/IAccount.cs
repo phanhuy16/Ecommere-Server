@@ -11,5 +11,5 @@ public interface IAccount
     Task<Response<object>> Register(Register register);
 
     Task<Response<object>> Login(Login login);
-    Task<ResponseDTO> RefreshToken(TokenRequest tokenRequest);
+    Task<IActionResult> RefreshToken(TokenRequest tokenRequest);
 }
