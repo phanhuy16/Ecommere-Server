@@ -10,6 +10,8 @@ using Server.Utilities.Response;
 
 namespace Server.Controllers;
 
+[Authorize(Roles = "Admin")]
+
 [ApiController]
 [Route("api/[controller]")]
 public class ProductsController : ControllerBase
@@ -85,8 +87,6 @@ public class ProductsController : ControllerBase
         return Ok(response);
     }
 
-
-    [Authorize(Roles = "Admin")]
 
     [HttpPost, Route("add-new")]
     [ProducesResponseType(typeof(Response<Product>), (int)HttpStatusCode.OK)]

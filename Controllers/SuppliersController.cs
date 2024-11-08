@@ -9,6 +9,9 @@ using Server.Utilities.Response;
 
 namespace Server.Controllers;
 
+
+[Authorize(Roles = "Admin")]
+
 [ApiController]
 [Route("api/[controller]")]
 public class SuppliersController : ControllerBase
@@ -41,7 +44,7 @@ public class SuppliersController : ControllerBase
 
     }
 
-    [HttpGet, Route("getbyid")]
+    [HttpGet, Route("get-by-id")]
     public async Task<ActionResult> GetById([FromQuery] Guid id)
     {
         var response = await _supplierService.GetById(id);
@@ -49,7 +52,12 @@ public class SuppliersController : ControllerBase
     }
 
 
-    // [Authorize(Roles = "Admin")]
+    [HttpGet, Route("export-excel")]
+    public async Task<ActionResult> ExportExcel()
+    {
+        var response = await _supplierService.ExportExcel();
+        return Ok(response);
+    }
 
     [HttpPost, Route("add-new")]
     [ProducesResponseType(typeof(List<Response<Supplier>>), (int)HttpStatusCode.OK)]

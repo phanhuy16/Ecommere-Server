@@ -65,7 +65,7 @@ public class AccountController : ControllerBase
 
     [AllowAnonymous]
     [HttpPost]
-    [Route("refreshtoken")]
+    [Route("refresh-token")]
     [ProducesResponseType(typeof(IActionResult), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(IActionResult), (int)HttpStatusCode.Unauthorized)]
     public async Task<ActionResult> RefreshToken(TokenRequest tokenRequest)

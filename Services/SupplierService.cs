@@ -3,6 +3,7 @@ using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using OfficeOpenXml;
 using Server.Contracts;
 using Server.Data;
 using Server.Entities;
@@ -344,6 +345,83 @@ public class SupplierService : ISupplier
             {
                 await transaction.RollbackAsync();
                 return new Response<Supplier>
+                {
+                    IsSuccess = false,
+                    Message = _appSettings.GetConfigurationValue("SupplierMessages", "SupplierNotFound") + " " +
+            ex.Message.ToString(),
+                    HttpStatusCode = HttpStatusCode.BadRequest,
+                };
+            }
+        }
+    }
+
+    public async Task<Response<FileContentResult>> ExportExcel()
+    {
+        using (var transaction = await _context.Database.BeginTransactionAsync())
+        {
+            try
+            {
+                var supplier = await _context.Suppliers.ToListAsync();
+
+                using (var package = new ExcelPackage())
+                {
+                    var worksheet = package.Workbook.Worksheets.Add("Supplier");
+
+                    worksheet.Cells[1, 1].Value = "ID";
+                    worksheet.Cells[1, 2].Value = "Name";
+                    worksheet.Cells[1, 3].Value = "Slug";
+                    worksheet.Cells[1, 4].Value = "Price";
+                    worksheet.Cells[1, 5].Value = "Product";
+                    worksheet.Cells[1, 6].Value = "Contact";
+                    worksheet.Cells[1, 7].Value = "IsTalking";
+                    worksheet.Cells[1, 8].Value = "Email";
+                    worksheet.Cells[1, 9].Value = "Active";
+                    worksheet.Cells[1, 10].Value = "Image";
+                    worksheet.Cells[1, 11].Value = "CreatedAt";
+                    worksheet.Cells[1, 12].Value = "UpdatedAt";
+                    worksheet.Cells[1, 13].Value = "Categories";
+
+                    for (int i = 0; i < supplier.Count; i++)
+                    {
+                        worksheet.Cells[i + 2, 1].Value = supplier[i].Id;
+                        worksheet.Cells[i + 2, 2].Value = supplier[i].Name;
+                        worksheet.Cells[i + 2, 3].Value = supplier[i].Slug;
+                        worksheet.Cells[i + 2, 4].Value = supplier[i].Price;
+                        worksheet.Cells[i + 2, 5].Value = supplier[i].Product;
+                        worksheet.Cells[i + 2, 6].Value = supplier[i].Contact;
+                        worksheet.Cells[i + 2, 7].Value = supplier[i].IsTalking;
+                        worksheet.Cells[i + 2, 8].Value = supplier[i].Email;
+                        worksheet.Cells[i + 2, 9].Value = supplier[i].Active;
+                        worksheet.Cells[i + 2, 10].Value = supplier[i].Image;
+                        worksheet.Cells[i + 2, 11].Value = supplier[i].CreatedAt;
+                        worksheet.Cells[i + 2, 12].Value = supplier[i].UpdatedAt;
+                        worksheet.Cells[i + 2, 13].Value = supplier[i].Categories; worksheet.Cells[i + 2, 3].Value = supplier[i].Slug;
+                    }
+
+                    // Thiết lập response để trả về file Excel
+                    var fileName = "Supplier.xlsx";
+                    var fileContent = package.GetAsByteArray();
+
+                    var result = new FileContentResult(fileContent, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                    {
+                        FileDownloadName = fileName
+                    };
+
+                    await transaction.CommitAsync();
+
+                    return new Response<FileContentResult>
+                    {
+                        Data = result,
+                        IsSuccess = true,
+                        Message = _appSettings.GetConfigurationValue("SupplierMessages", "GetSupplierSuccess"),
+                        HttpStatusCode = HttpStatusCode.OK,
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                return new Response<FileContentResult>()
                 {
                     IsSuccess = false,
                     Message = _appSettings.GetConfigurationValue("SupplierMessages", "SupplierNotFound") + " " +

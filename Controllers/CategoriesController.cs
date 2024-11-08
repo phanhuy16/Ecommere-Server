@@ -9,6 +9,8 @@ using Server.Utilities.Response;
 
 namespace Server.Controllers;
 
+[Authorize(Roles = "Admin")]
+
 [ApiController]
 [Route("api/[controller]")]
 public class CategoriesController : ControllerBase
@@ -46,8 +48,6 @@ public class CategoriesController : ControllerBase
         var response = await _categoryService.GetById(id);
         return Ok(response);
     }
-
-    [Authorize(Roles = "Admin")]
 
     [HttpPost]
     [Route("add-new")]

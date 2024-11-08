@@ -9,6 +9,8 @@ using Server.Utilities.Response;
 namespace Server.Controllers;
 
 
+[Authorize(Roles = "Admin")]
+
 [ApiController]
 [Route("api/[controller]")]
 public class PromotionController : ControllerBase
@@ -40,8 +42,6 @@ public class PromotionController : ControllerBase
         return Ok(response);
     }
 
-
-    [Authorize(Roles = "Admin")]
 
     [HttpPut, Route("update")]
     [ProducesResponseType(typeof(List<Response<Promotion>>), (int)HttpStatusCode.OK)]
