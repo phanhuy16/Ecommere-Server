@@ -397,7 +397,7 @@ public class SupplierService : ISupplier
                         worksheet.Cells[i + 2, 10].Value = supplier[i].Image;
                         worksheet.Cells[i + 2, 11].Value = supplier[i].CreatedAt;
                         worksheet.Cells[i + 2, 12].Value = supplier[i].UpdatedAt;
-                        worksheet.Cells[i + 2, 13].Value = supplier[i].Categories; worksheet.Cells[i + 2, 3].Value = supplier[i].Slug;
+                        worksheet.Cells[i + 2, 13].Value = supplier[i].Categories;
                     }
 
                     // Thiết lập response để trả về file Excel

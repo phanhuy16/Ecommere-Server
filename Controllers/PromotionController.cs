@@ -33,6 +33,24 @@ public class PromotionController : ControllerBase
         return Ok(response);
     }
 
+
+    [HttpGet, Route("export-excel")]
+    public async Task<ActionResult> ExportExcel()
+    {
+        var response = await _promotionService.ExportExcel();
+        return Ok(response);
+    }
+
+
+    [HttpGet, Route("search")]
+    [ProducesResponseType(typeof(Response<IEnumerable<Promotion>>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(Response<IEnumerable<Promotion>>), (int)HttpStatusCode.BadRequest)]
+    public async Task<ActionResult<IEnumerable<Promotion>>> Search(string slug)
+    {
+        var response = await _promotionService.Search(slug);
+        return Ok(response);
+    }
+
     [HttpPost, Route("add-new")]
     [ProducesResponseType(typeof(Response<Promotion>), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(Response<Promotion>), (int)HttpStatusCode.BadRequest)]

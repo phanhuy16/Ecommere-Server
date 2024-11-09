@@ -1,4 +1,5 @@
 
+using Microsoft.AspNetCore.Mvc;
 using Server.Entities;
 using Server.Utilities.Response;
 
@@ -9,4 +10,6 @@ public interface IPromotion
     Task<Response<List<Promotion>>> GetAllPromotion();
     Task<Response<Promotion>> UpdatePromotion(Promotion promo, Guid Id);
     Task<Response<Promotion>> DeletePromotion(Guid Id);
+    Task<Response<FileContentResult>> ExportExcel();
+    Task<Response<IEnumerable<Promotion>>> Search(string slug);
 }

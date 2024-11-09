@@ -63,7 +63,7 @@ public class SuppliersController : ControllerBase
     [HttpGet, Route("search")]
     [ProducesResponseType(typeof(Response<IEnumerable<Supplier>>), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(Response<IEnumerable<Supplier>>), (int)HttpStatusCode.BadRequest)]
-    public async Task<ActionResult<IEnumerable<Product>>> Search(string slug)
+    public async Task<ActionResult<IEnumerable<Supplier>>> Search(string slug)
     {
         var response = await _supplierService.Search(slug);
         return Ok(response);
