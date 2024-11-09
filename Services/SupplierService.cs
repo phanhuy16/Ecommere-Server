@@ -2,14 +2,16 @@
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using OfficeOpenXml;
+using PdfSharpCore;
+using PdfSharpCore.Pdf;
 using Server.Contracts;
 using Server.Data;
 using Server.Entities;
 using Server.Helper;
 using Server.Utilities.Pagination;
 using Server.Utilities.Response;
+using TheArtOfDev.HtmlRenderer.PdfSharp;
 
 namespace Server.Services;
 
@@ -422,6 +424,45 @@ public class SupplierService : ISupplier
             {
                 await transaction.RollbackAsync();
                 return new Response<FileContentResult>()
+                {
+                    IsSuccess = false,
+                    Message = _appSettings.GetConfigurationValue("SupplierMessages", "SupplierNotFound") + " " +
+            ex.Message.ToString(),
+                    HttpStatusCode = HttpStatusCode.BadRequest,
+                };
+            }
+        }
+    }
+
+    public async Task<Response<IEnumerable<Supplier>>> Search(string slug)
+    {
+        using (var transaction = await _context.Database.BeginTransactionAsync())
+        {
+            try
+            {
+                IQueryable<Supplier> query = _context.Suppliers;
+
+                if (!string.IsNullOrEmpty(slug))
+                {
+                    query = query.Where(e => e.Slug.Contains(slug)
+                                || e.Name.Contains(slug));
+                }
+
+                await transaction.CommitAsync();
+
+                return new Response<IEnumerable<Supplier>>()
+                {
+                    Data = await query.ToListAsync(),
+                    IsSuccess = true,
+                    Message = _appSettings.GetConfigurationValue("SupplierMessages", "GetSupplierSuccess"),
+                    HttpStatusCode = HttpStatusCode.OK,
+                };
+
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                return new Response<IEnumerable<Supplier>>()
                 {
                     IsSuccess = false,
                     Message = _appSettings.GetConfigurationValue("SupplierMessages", "SupplierNotFound") + " " +

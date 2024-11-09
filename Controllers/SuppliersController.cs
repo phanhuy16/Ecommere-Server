@@ -59,9 +59,19 @@ public class SuppliersController : ControllerBase
         return Ok(response);
     }
 
+
+    [HttpGet, Route("search")]
+    [ProducesResponseType(typeof(Response<IEnumerable<Supplier>>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(Response<IEnumerable<Supplier>>), (int)HttpStatusCode.BadRequest)]
+    public async Task<ActionResult<IEnumerable<Product>>> Search(string slug)
+    {
+        var response = await _supplierService.Search(slug);
+        return Ok(response);
+    }
+
     [HttpPost, Route("add-new")]
     [ProducesResponseType(typeof(List<Response<Supplier>>), (int)HttpStatusCode.OK)]
-    [ProducesResponseType(typeof(Response<Supplier>), (int)HttpStatusCode.BadRequest)]
+    [ProducesResponseType(typeof(List<Response<Supplier>>), (int)HttpStatusCode.BadRequest)]
     public async Task<ActionResult> Post([FromBody] Supplier supplier)
     {
         var response = await _supplierService.Post(supplier);

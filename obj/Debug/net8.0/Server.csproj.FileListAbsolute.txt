@@ -166,3 +166,9 @@ D:\Projects\ChuyenDeThucTap\Server\bin\Debug\net8.0\System.Security.Cryptography
 D:\Projects\ChuyenDeThucTap\Server\bin\Debug\net8.0\runtimes\win\lib\net7.0\Microsoft.Win32.SystemEvents.dll
 D:\Projects\ChuyenDeThucTap\Server\bin\Debug\net8.0\runtimes\win\lib\net7.0\System.Drawing.Common.dll
 D:\Projects\ChuyenDeThucTap\Server\bin\Debug\net8.0\runtimes\win\lib\net8.0\System.Security.Cryptography.Pkcs.dll
+D:\Projects\ChuyenDeThucTap\Server\bin\Debug\net8.0\PdfSharpCore.dll
+D:\Projects\ChuyenDeThucTap\Server\bin\Debug\net8.0\HtmlRenderer.Core.dll
+D:\Projects\ChuyenDeThucTap\Server\bin\Debug\net8.0\HtmlRenderer.PdfSharp.Core.dll
+D:\Projects\ChuyenDeThucTap\Server\bin\Debug\net8.0\SixLabors.Core.dll
+D:\Projects\ChuyenDeThucTap\Server\bin\Debug\net8.0\SixLabors.Fonts.dll
+D:\Projects\ChuyenDeThucTap\Server\bin\Debug\net8.0\SixLabors.ImageSharp.dll
