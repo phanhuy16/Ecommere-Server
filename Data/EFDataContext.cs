@@ -17,6 +17,8 @@ public partial class EFDataContext : IdentityDbContext<User>
     public virtual DbSet<Supplier> Suppliers { get; set; } = null!;
     public virtual DbSet<Promotion> Promotions { get; set; } = null!;
     public virtual DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
+    public virtual DbSet<ProductCategory> ProductCategories { get; set; } = null!;
+    public virtual DbSet<SupplierCategory> SupplierCategories { get; set; } = null!;
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -36,6 +38,10 @@ public partial class EFDataContext : IdentityDbContext<User>
 
         modelBuilder.Entity<IdentityRole>().HasData(user);
         modelBuilder.Entity<IdentityRole>().HasData(admin);
+
+        modelBuilder.Entity<ProductCategory>().HasKey(sc => new { sc.ProductId, sc.CategoryId });
+
+        modelBuilder.Entity<SupplierCategory>().HasKey(sc => new { sc.SupplierId, sc.CategoryId });
 
         // Cart
         modelBuilder.Entity<Cart>(entity =>

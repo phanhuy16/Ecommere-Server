@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Server.Data;
 
@@ -11,9 +12,11 @@ using Server.Data;
 namespace Server.Data.Migrations
 {
     [DbContext(typeof(EFDataContext))]
-    partial class EFDataContextModelSnapshot : ModelSnapshot
+    [Migration("20241114121149_relationships supplier to category and product to supplier")]
+    partial class relationshipssuppliertocategoryandproducttosupplier
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -51,13 +54,13 @@ namespace Server.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "a1453f68-783d-42c9-b091-17c6c816716a",
+                            Id = "9d747d7b-a08f-491c-ae11-1abbc1541427",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
-                            Id = "079cb971-2603-4597-8f46-1c28d19640ef",
+                            Id = "fb36f821-4878-4bf4-ab36-8cc37cf52bf2",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         });

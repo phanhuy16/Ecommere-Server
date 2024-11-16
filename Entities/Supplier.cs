@@ -19,8 +19,7 @@ public class Supplier
     public DateTime? CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
 
+    public virtual List<SupplierCategory> SupplierCategory { get; set; } = new List<SupplierCategory>();
     [JsonIgnore]
-    [DisplayName("Categories")]
-    [DisplayFormat(ConvertEmptyStringToNull = false)]
-    public virtual List<Category> Categories { get; set; } = new List<Category>();
+    public ICollection<Product> Products { get; set; } = new List<Product>();
 }

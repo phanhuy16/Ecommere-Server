@@ -157,9 +157,7 @@ public class ProductService : IProduct
             {
                 Title = pro.Title,
                 Slug = pro.Slug,
-                Suppliers = await _context.Suppliers
-                .Where(s => pro.Suppliers.Select(ps => ps.Id).Contains(s.Id))
-                .ToListAsync(),
+                SupplierId = pro.SupplierId,
                 Content = pro.Content,
                 Images = pro.Images,
                 Description = pro.Description,
@@ -170,17 +168,20 @@ public class ProductService : IProduct
             await _context.Products.AddAsync(product);
             await _context.SaveChangesAsync();
 
-            if (pro.Categories != null && pro.Categories.Any())
+            if (pro.ProductCategories != null && pro.ProductCategories.Any())
             {
-                foreach (var category in pro.Categories)
+                foreach (var category in pro.ProductCategories)
                 {
-                    var existingCategory = await _context.Categories.FirstOrDefaultAsync(c => c.Id == category.Id);
+                    var existingCategory = await _context.Categories.FirstOrDefaultAsync(c => c.Id == category.CategoryId);
 
                     // Kiểm tra danh mục có tồn tại không
                     if (existingCategory == null)
                     {
                         // Nếu danh mục không hợp lệ, rollback transaction
                         await transaction.RollbackAsync();
+
+                        // Xóa sản phẩm đã thêm nếu danh mục không hợp lệ
+                        _context.Products.Remove(product);
 
                         return new Response<Product>
                         {
@@ -190,7 +191,12 @@ public class ProductService : IProduct
                         };
                     }
 
-                    product.Categories.Add(existingCategory);
+                    var productCategories = new ProductCategory
+                    {
+                        ProductId = product.Id,
+                        CategoryId = category.CategoryId
+                    };
+                    await _context.ProductCategories.AddAsync(productCategories);
                 }
             }
 
@@ -252,9 +258,6 @@ public class ProductService : IProduct
 
                 product.Title = pro.Title;
                 product.Slug = pro.Slug;
-                product.Suppliers = await _context.Suppliers
-                .Where(s => pro.Suppliers.Select(ps => ps.Id).Contains(s.Id))
-                .ToListAsync();
                 product.Content = pro.Content;
                 product.Description = pro.Description;
                 product.Images = pro.Images;
@@ -263,22 +266,23 @@ public class ProductService : IProduct
 
                 _context.Products.Update(product);
 
-                var existingCategoryIds = product.Categories.Select(pc => pc.Id).ToList();
-                var newCategoryIds = pro.Categories.Select(pc => pc.Id).ToList();
+                var existingCategoryIds = product.ProductCategories.Select(pc => pc.CategoryId).ToList();
+
+                var newCategoryIds = pro.ProductCategories.Select(pc => pc.CategoryId).ToList();
 
                 if (!existingCategoryIds.SequenceEqual(newCategoryIds))
                 {
-                    var existingCategories = _context.Categories.Where(pc => pc.Id == ProductId).ToList();
-
-                    _context.Categories.RemoveRange(existingCategories);
+                    var existingProductCategories = _context.ProductCategories.Where(pc => pc.ProductId == ProductId).ToList();
+                    _context.ProductCategories.RemoveRange(existingProductCategories);
 
                     foreach (var categoryId in newCategoryIds)
                     {
-                        var category = await _context.Categories.FindAsync(categoryId);
-                        if (category != null)
+                        var productCategory = new ProductCategory
                         {
-                            product.Categories.Add(category);
-                        }
+                            ProductId = product.Id,
+                            CategoryId = categoryId
+                        };
+                        await _context.ProductCategories.AddAsync(productCategory);
                     }
                 }
 
@@ -425,22 +429,22 @@ public class ProductService : IProduct
             try
             {
                 var products = await _context.Products
-                        .Include(p => p.Categories)
+                        .Include(p => p.ProductCategories)
                         .Include(p => p.SubProducts)
-                        .Include(p => p.Suppliers)
+                        .Include(p => p.Supplier)
                         .Select(pro => new Product
                         {
                             Id = pro.Id,
                             Title = pro.Title,
                             Slug = pro.Slug,
-                            Suppliers = pro.Suppliers,
+                            Supplier = pro.Supplier,
                             Content = pro.Content,
                             Description = pro.Description,
                             Images = pro.Images,
                             ExpiryDate = pro.ExpiryDate,
                             CreatedAt = pro.CreatedAt,
                             UpdatedAt = pro.UpdatedAt,
-                            Categories = pro.Categories,
+                            ProductCategories = pro.ProductCategories,
                             SubProducts = pro.SubProducts
                         })
                         .OrderByDescending(x => x.Id)
@@ -477,21 +481,22 @@ public class ProductService : IProduct
             try
             {
                 var products = await _context.Products
+                        .Include(p => p.ProductCategories)
                         .Include(p => p.SubProducts)
-                        .Include(p => p.Suppliers)
+                        .Include(p => p.Supplier)
                         .Select(pro => new Product
                         {
                             Id = pro.Id,
                             Title = pro.Title,
                             Slug = pro.Slug,
-                            Suppliers = pro.Suppliers,
+                            Supplier = pro.Supplier,
                             Content = pro.Content,
                             Description = pro.Description,
                             Images = pro.Images,
                             ExpiryDate = pro.ExpiryDate,
                             CreatedAt = pro.CreatedAt,
                             UpdatedAt = pro.UpdatedAt,
-                            Categories = pro.Categories,
+                            ProductCategories = pro.ProductCategories,
                             SubProducts = pro.SubProducts
                         })
                         .OrderByDescending(x => x.Id)
@@ -532,21 +537,22 @@ public class ProductService : IProduct
                 var totalRecords = await _context.Products.CountAsync();
 
                 var products = await _context.Products
+                        .Include(p => p.ProductCategories)
                         .Include(p => p.SubProducts)
-                        .Include(p => p.Suppliers)
+                        .Include(p => p.Supplier)
                         .Select(pro => new Product
                         {
                             Id = pro.Id,
                             Title = pro.Title,
                             Slug = pro.Slug,
-                            Suppliers = pro.Suppliers,
+                            Supplier = pro.Supplier,
                             Content = pro.Content,
                             Description = pro.Description,
                             Images = pro.Images,
                             ExpiryDate = pro.ExpiryDate,
                             CreatedAt = pro.CreatedAt,
                             UpdatedAt = pro.UpdatedAt,
-                            Categories = pro.Categories,
+                            ProductCategories = pro.ProductCategories,
                             SubProducts = pro.SubProducts
                         })
                         .OrderByDescending(x => x.Id)
@@ -586,6 +592,7 @@ public class ProductService : IProduct
                     };
                 }
                 var product = await _context.Products
+                                    .Include(p => p.ProductCategories)
                                     .Include(p => p.SubProducts)
                                     .Where(c => c.Id == ProductId)
                                     .Select(pro => new Product
@@ -593,14 +600,14 @@ public class ProductService : IProduct
                                         Id = pro.Id,
                                         Title = pro.Title,
                                         Slug = pro.Slug,
-                                        Suppliers = pro.Suppliers,
+                                        Supplier = pro.Supplier,
                                         Content = pro.Content,
                                         Description = pro.Description,
                                         Images = pro.Images,
                                         ExpiryDate = pro.ExpiryDate,
                                         CreatedAt = pro.CreatedAt,
                                         UpdatedAt = pro.UpdatedAt,
-                                        Categories = pro.Categories,
+                                        ProductCategories = pro.ProductCategories,
                                         SubProducts = pro.SubProducts
                                     })
                                     .OrderByDescending(x => x.Id).FirstOrDefaultAsync();
@@ -701,7 +708,7 @@ public class ProductService : IProduct
                     .Include(sp => sp.Product)
                     .ThenInclude(p => p.SubProducts)
                     .Include(sp => sp.Product)
-                    .ThenInclude(pc => pc.Categories)
+                    .ThenInclude(pc => pc.ProductCategories)
                     .AsQueryable();
 
                 // Lọc theo màu sắc
@@ -727,8 +734,8 @@ public class ProductService : IProduct
                 // Lọc theo danh mục sản phẩm
                 if (filter.Categories != null && filter.Categories.Any())
                 {
-                    query = query.Where(sp => sp.Product.Categories
-                        .Any(pc => filter.Categories.Contains(pc.Id.ToString())));
+                    query = query.Where(sp => sp.Product.ProductCategories
+                        .Any(pc => filter.Categories.Contains(pc.CategoryId.ToString())));
                 }
 
                 // Truy vấn các sản phẩm đã được lọc

@@ -17,11 +17,14 @@ public class Product
     public DateTime? CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
 
-    public virtual ICollection<Category> Categories { get; set; } = new List<Category>();
+    public Guid SupplierId { get; set; }
+    [JsonIgnore]
+    public Supplier? Supplier { get; set; } = null!;
+
+    [JsonIgnore]
+    public virtual ICollection<ProductCategory> ProductCategories { get; set; } = new List<ProductCategory>();
     [JsonIgnore]
     public virtual ICollection<SubProduct> SubProducts { get; set; } = new List<SubProduct>();
     [JsonIgnore]
     public virtual ICollection<Cart> Carts { get; set; } = new List<Cart>();
-    [JsonIgnore]
-    public virtual ICollection<Supplier> Suppliers { get; set; } = new List<Supplier>();
 }

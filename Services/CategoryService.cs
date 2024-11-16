@@ -29,7 +29,7 @@ public class CategoryService : ICategory
             try
             {
                 var categories = await _context.Categories
-                    .Include(c => c.SubCategories)
+                    .Include(c => c.SupplierCategories)
                     .Select(cate => new Category
                     {
                         Id = cate.Id,
@@ -39,8 +39,7 @@ public class CategoryService : ICategory
                         Description = cate.Description,
                         CreatedAt = cate.CreatedAt,
                         UpdatedAt = cate.UpdatedAt,
-                        SubCategories = cate.SubCategories,
-                        Suppliers = cate.Suppliers
+                        SupplierCategories = cate.SupplierCategories
                     })
                     .OrderByDescending(x => x.Id)
                     .ToListAsync();
@@ -79,8 +78,7 @@ public class CategoryService : ICategory
                 var totalRecords = await _context.Categories.CountAsync();
 
                 var categories = await _context.Categories
-                    .Include(c => c.SubCategories)  // Thêm Include để lấy các danh mục con
-                    .Include(sp => sp.Suppliers)
+                    .Include(c => c.SupplierCategories)
                     .Select(cate => new Category
                     {
                         Id = cate.Id,
@@ -90,8 +88,7 @@ public class CategoryService : ICategory
                         Description = cate.Description,
                         CreatedAt = cate.CreatedAt,
                         UpdatedAt = cate.UpdatedAt,
-                        SubCategories = cate.SubCategories,
-                        Suppliers = cate.Suppliers
+                        SupplierCategories = cate.SupplierCategories
                     })
                     .OrderByDescending(x => x.Id)
                     .Skip((validFilter.PageNumber - 1) * validFilter.PageSize)
@@ -130,7 +127,7 @@ public class CategoryService : ICategory
                     };
                 }
                 var categories = await _context.Categories
-                    .Include(c => c.SubCategories)
+                    .Include(c => c.SupplierCategories)
                     .Where(c => c.Id == CategoryId)
                     .Select(cate => new Category
                     {
@@ -141,8 +138,7 @@ public class CategoryService : ICategory
                         Description = cate.Description,
                         CreatedAt = cate.CreatedAt,
                         UpdatedAt = cate.UpdatedAt,
-                        SubCategories = cate.SubCategories,
-                        Suppliers = cate.Suppliers
+                        SupplierCategories = cate.SupplierCategories
                     })
                     .OrderByDescending(x => x.Id)
                     .FirstOrDefaultAsync();
@@ -275,7 +271,7 @@ public class CategoryService : ICategory
                     };
                 }
 
-                var category = _context.Categories.Include(c => c.SubCategories).Where(x => x.Id == CategoryId).FirstOrDefault();
+                var category = _context.Categories.Where(x => x.Id == CategoryId).FirstOrDefault();
 
                 if (category == null)
                 {
@@ -287,21 +283,21 @@ public class CategoryService : ICategory
                     };
                 }
 
-                // Cập nhật các danh mục con (nếu có) để chuyển chúng thành danh mục cha
-                if (category.SubCategories != null && category.SubCategories.Any())
-                {
-                    foreach (var subCategory in category.SubCategories)
-                    {
-                        subCategory.ParentId = null; // Bỏ liên kết danh mục cha, chuyển thành danh mục cha
-                        _context.Categories.Update(subCategory);
-                    }
-                }
+                // // Cập nhật các danh mục con (nếu có) để chuyển chúng thành danh mục cha
+                // if (category.SubCategories != null && category.SubCategories.Any())
+                // {
+                //     foreach (var subCategory in category.SubCategories)
+                //     {
+                //         subCategory.ParentId = null; // Bỏ liên kết danh mục cha, chuyển thành danh mục cha
+                //         _context.Categories.Update(subCategory);
+                //     }
+                // }
 
-                // Xóa tất cả các sản phẩm liên quan đến danh mục này (nếu cần)
-                if (category.Products != null && category.Products.Any())
-                {
-                    _context.Products.RemoveRange(category.Products);
-                }
+                // // Xóa tất cả các sản phẩm liên quan đến danh mục này (nếu cần)
+                // if (category.Products != null && category.Products.Any())
+                // {
+                //     _context.Products.RemoveRange(category.Products);
+                // }
 
                 // Xóa danh mục
                 _context.Categories.Remove(category);
