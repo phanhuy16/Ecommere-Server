@@ -12,8 +12,8 @@ using Server.Data;
 namespace Server.Data.Migrations
 {
     [DbContext(typeof(EFDataContext))]
-    [Migration("20241106125440_Edit supplier image")]
-    partial class Editsupplierimage
+    [Migration("20241117130952_allow category null")]
+    partial class allowcategorynull
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,36 +24,6 @@ namespace Server.Data.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("CategoryProduct", b =>
-                {
-                    b.Property<Guid>("CategoriesId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("ProductsId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("CategoriesId", "ProductsId");
-
-                    b.HasIndex("ProductsId");
-
-                    b.ToTable("CategoryProduct");
-                });
-
-            modelBuilder.Entity("CategorySupplier", b =>
-                {
-                    b.Property<Guid>("CategoriesId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("SuppliersId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("CategoriesId", "SuppliersId");
-
-                    b.HasIndex("SuppliersId");
-
-                    b.ToTable("CategorySupplier");
-                });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
@@ -84,13 +54,13 @@ namespace Server.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "bb360186-d3fd-45ee-8647-5f856e91e940",
+                            Id = "7d6ae6a5-3e97-445f-ba54-92b098cd20e8",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
-                            Id = "31e13739-a84d-419f-a2c0-9fb7db93c6c8",
+                            Id = "2faa6493-7e2d-4654-ab84-79769ec25578",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         });
@@ -258,9 +228,6 @@ namespace Server.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("CategoryId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -282,8 +249,6 @@ namespace Server.Data.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CategoryId");
 
                     b.ToTable("Categories");
                 });
@@ -312,6 +277,9 @@ namespace Server.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Content")
                         .HasColumnType("nvarchar(max)");
 
@@ -332,6 +300,9 @@ namespace Server.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("SupplierId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -341,7 +312,11 @@ namespace Server.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Products");
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("SupplierId");
+
+                    b.ToTable("products", (string)null);
                 });
 
             modelBuilder.Entity("Server.Entities.Promotion", b =>
@@ -365,6 +340,10 @@ namespace Server.Data.Migrations
 
                     b.Property<int>("NumOfAvailable")
                         .HasColumnType("int");
+
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("StartAt")
                         .HasColumnType("datetime2");
@@ -478,6 +457,9 @@ namespace Server.Data.Migrations
                     b.Property<int>("Active")
                         .HasColumnType("int");
 
+                    b.Property<Guid>("CategoyId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Contact")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -505,9 +487,6 @@ namespace Server.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("ProductId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("Slug")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -517,9 +496,9 @@ namespace Server.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProductId");
+                    b.HasIndex("CategoyId");
 
-                    b.ToTable("Suppliers");
+                    b.ToTable("suppliers", (string)null);
                 });
 
             modelBuilder.Entity("Server.Entities.User", b =>
@@ -585,36 +564,6 @@ namespace Server.Data.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
-                });
-
-            modelBuilder.Entity("CategoryProduct", b =>
-                {
-                    b.HasOne("Server.Entities.Category", null)
-                        .WithMany()
-                        .HasForeignKey("CategoriesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Server.Entities.Product", null)
-                        .WithMany()
-                        .HasForeignKey("ProductsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("CategorySupplier", b =>
-                {
-                    b.HasOne("Server.Entities.Category", null)
-                        .WithMany()
-                        .HasForeignKey("CategoriesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Server.Entities.Supplier", null)
-                        .WithMany()
-                        .HasForeignKey("SuppliersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -687,11 +636,23 @@ namespace Server.Data.Migrations
                     b.Navigation("SubProduct");
                 });
 
-            modelBuilder.Entity("Server.Entities.Category", b =>
+            modelBuilder.Entity("Server.Entities.Product", b =>
                 {
-                    b.HasOne("Server.Entities.Category", null)
-                        .WithMany("SubCategories")
-                        .HasForeignKey("CategoryId");
+                    b.HasOne("Server.Entities.Category", "Category")
+                        .WithMany("Products")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Server.Entities.Supplier", "Supplier")
+                        .WithMany("Products")
+                        .HasForeignKey("SupplierId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+
+                    b.Navigation("Supplier");
                 });
 
             modelBuilder.Entity("Server.Entities.RefreshToken", b =>
@@ -724,14 +685,20 @@ namespace Server.Data.Migrations
 
             modelBuilder.Entity("Server.Entities.Supplier", b =>
                 {
-                    b.HasOne("Server.Entities.Product", null)
+                    b.HasOne("Server.Entities.Category", "Category")
                         .WithMany("Suppliers")
-                        .HasForeignKey("ProductId");
+                        .HasForeignKey("CategoyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Category");
                 });
 
             modelBuilder.Entity("Server.Entities.Category", b =>
                 {
-                    b.Navigation("SubCategories");
+                    b.Navigation("Products");
+
+                    b.Navigation("Suppliers");
                 });
 
             modelBuilder.Entity("Server.Entities.Order", b =>
@@ -744,13 +711,16 @@ namespace Server.Data.Migrations
                     b.Navigation("Carts");
 
                     b.Navigation("SubProducts");
-
-                    b.Navigation("Suppliers");
                 });
 
             modelBuilder.Entity("Server.Entities.SubProduct", b =>
                 {
                     b.Navigation("Carts");
+                });
+
+            modelBuilder.Entity("Server.Entities.Supplier", b =>
+                {
+                    b.Navigation("Products");
                 });
 #pragma warning restore 612, 618
         }

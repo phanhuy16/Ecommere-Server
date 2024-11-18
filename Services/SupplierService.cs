@@ -43,38 +43,10 @@ public class SupplierService : ISupplier
                     Image = sup.Image,
                     CreatedAt = DateTime.UtcNow,
                     Product = sup.Product,
+                    CategoryId = sup.CategoryId,
                 };
 
                 await _context.Suppliers.AddAsync(supplier);
-
-                if (sup.SupplierCategory != null && sup.SupplierCategory.Any())
-                {
-                    foreach (var category in sup.SupplierCategory)
-                    {
-                        var existingCategory = await _context.Categories.FirstOrDefaultAsync(c => c.Id == category.CategoryId);
-
-                        // Kiểm tra danh mục có tồn tại không
-                        if (existingCategory == null)
-                        {
-                            // Nếu danh mục không hợp lệ, rollback transaction
-                            await transaction.RollbackAsync();
-
-                            return new Response<Supplier>
-                            {
-                                IsSuccess = false,
-                                Message = _appSettings.GetConfigurationValue("SupplierMessages", "SupplierNotFound"),
-                                HttpStatusCode = HttpStatusCode.BadRequest,
-                            };
-                        }
-
-                        var supplierCategories = new SupplierCategory
-                        {
-                            SupplierId = supplier.Id,
-                            CategoryId = category.CategoryId
-                        };
-                        await _context.SupplierCategories.AddAsync(supplierCategories);
-                    }
-                }
 
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
@@ -141,28 +113,9 @@ public class SupplierService : ISupplier
                 supplier.Image = sup.Image;
                 supplier.UpdatedAt = DateTime.UtcNow;
                 supplier.Product = sup.Product;
+                supplier.CategoryId = sup.CategoryId;
 
                 _context.Suppliers.Update(supplier);
-
-                var existingCategoryIds = supplier.SupplierCategory.Select(pc => pc.CategoryId).ToList();
-
-                var newCategoryIds = sup.SupplierCategory.Select(pc => pc.CategoryId).ToList();
-
-                if (!existingCategoryIds.SequenceEqual(newCategoryIds))
-                {
-                    var existingSupplierCategories = _context.SupplierCategories.Where(pc => pc.SupplierId == SupplierId).ToList();
-                    _context.SupplierCategories.RemoveRange(existingSupplierCategories);
-
-                    foreach (var categoryId in newCategoryIds)
-                    {
-                        var supplierCategory = new SupplierCategory
-                        {
-                            SupplierId = supplier.Id,
-                            CategoryId = categoryId
-                        };
-                        await _context.SupplierCategories.AddAsync(supplierCategory);
-                    }
-                }
 
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
@@ -254,7 +207,7 @@ public class SupplierService : ISupplier
                 var totalRecords = await _context.Suppliers.CountAsync();
 
                 var supplier = await _context.Suppliers
-                                .Include(c => c.SupplierCategory)
+                                .Include(c => c.Category)
                                 .Select(sup => new Supplier
                                 {
                                     Id = sup.Id,
@@ -269,14 +222,7 @@ public class SupplierService : ISupplier
                                     Product = sup.Product,
                                     CreatedAt = DateTime.UtcNow,
                                     UpdatedAt = DateTime.UtcNow,
-                                    SupplierCategory = sup.SupplierCategory.Select(sc => new SupplierCategory
-                                    {
-                                        Category = new Category()
-                                        {
-                                            Id = sc.Category.Id,
-                                            Title = sc.Category.Title,
-                                        }
-                                    }).ToList(),
+                                    Category = sup.Category,
                                 })
                                 .OrderByDescending(x => x.Id)
                                 .Skip((validFilter.PageNumber - 1) * validFilter.PageSize)
@@ -304,7 +250,7 @@ public class SupplierService : ISupplier
             try
             {
                 var supplier = await _context.Suppliers
-                                .Include(c => c.SupplierCategory)
+                                .Include(c => c.Category)
                                 .Select(sup => new Supplier
                                 {
                                     Id = sup.Id,
@@ -319,14 +265,7 @@ public class SupplierService : ISupplier
                                     Product = sup.Product,
                                     CreatedAt = DateTime.UtcNow,
                                     UpdatedAt = DateTime.UtcNow,
-                                    SupplierCategory = sup.SupplierCategory.Select(sc => new SupplierCategory
-                                    {
-                                        Category = new Category()
-                                        {
-                                            Id = sc.Category.Id,
-                                            Title = sc.Category.Title,
-                                        }
-                                    }).ToList(),
+                                    Category = sup.Category,
                                 }).OrderByDescending(x => x.Id).ToListAsync();
 
                 await transaction.CommitAsync();
@@ -370,7 +309,7 @@ public class SupplierService : ISupplier
                 }
 
                 var supplier = await _context.Suppliers
-                                .Include(c => c.SupplierCategory)
+                                .Include(c => c.Category)
                                 .Select(sup => new Supplier
                                 {
                                     Id = sup.Id,
@@ -385,14 +324,7 @@ public class SupplierService : ISupplier
                                     Image = sup.Image,
                                     CreatedAt = DateTime.UtcNow,
                                     UpdatedAt = DateTime.UtcNow,
-                                    SupplierCategory = sup.SupplierCategory.Select(sc => new SupplierCategory
-                                    {
-                                        Category = new Category()
-                                        {
-                                            Id = sc.Category.Id,
-                                            Title = sc.Category.Title,
-                                        }
-                                    }).ToList(),
+                                    Category = sup.Category,
                                 }).FirstOrDefaultAsync();
 
                 await transaction.CommitAsync();
@@ -425,7 +357,8 @@ public class SupplierService : ISupplier
         {
             try
             {
-                var supplier = await _context.Suppliers.ToListAsync();
+                var supplier = await _context.Suppliers
+                                .ToListAsync();
 
                 using (var package = new ExcelPackage())
                 {
@@ -459,11 +392,12 @@ public class SupplierService : ISupplier
                         worksheet.Cells[i + 2, 10].Value = supplier[i].Image;
                         worksheet.Cells[i + 2, 11].Value = supplier[i].CreatedAt;
                         worksheet.Cells[i + 2, 12].Value = supplier[i].UpdatedAt;
-                        worksheet.Cells[i + 2, 13].Value = supplier[i].SupplierCategory;
+
+                        worksheet.Cells[i + 2, 13].Value = supplier[i].Category;
                     }
 
                     // Thiết lập response để trả về file Excel
-                    var fileName = "Supplier.xlsx";
+                    var fileName = "Suppliers.xlsx";
                     var fileContent = package.GetAsByteArray();
 
                     var result = new FileContentResult(fileContent, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")

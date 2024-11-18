@@ -163,42 +163,44 @@ public class ProductService : IProduct
                 Description = pro.Description,
                 ExpiryDate = pro.ExpiryDate,
                 CreatedAt = DateTime.UtcNow,
+                CategoryId = pro.CategoryId,
             };
 
+            // await _context.SaveChangesAsync();
+
+            // if (pro.ProductCategories != null && pro.ProductCategories.Any())
+            // {
+            //     foreach (var category in pro.ProductCategories)
+            //     {
+            //         var existingCategory = await _context.Categories.FirstOrDefaultAsync(c => c.Id == category.CategoryId);
+
+            //         // Kiểm tra danh mục có tồn tại không
+            //         if (existingCategory == null)
+            //         {
+            //             // Nếu danh mục không hợp lệ, rollback transaction
+            //             await transaction.RollbackAsync();
+
+            //             // Xóa sản phẩm đã thêm nếu danh mục không hợp lệ
+            //             _context.Products.Remove(product);
+
+            //             return new Response<Product>
+            //             {
+            //                 IsSuccess = false,
+            //                 Message = _appSettings.GetConfigurationValue("ProductMessages", "ProductNotFound"),
+            //                 HttpStatusCode = HttpStatusCode.BadRequest,
+            //             };
+            //         }
+
+            //         var productCategories = new ProductCategory
+            //         {
+            //             ProductId = product.Id,
+            //             CategoryId = category.CategoryId
+            //         };
+            //         await _context.ProductCategories.AddAsync(productCategories);
+            //     }
+            // }
+
             await _context.Products.AddAsync(product);
-            await _context.SaveChangesAsync();
-
-            if (pro.ProductCategories != null && pro.ProductCategories.Any())
-            {
-                foreach (var category in pro.ProductCategories)
-                {
-                    var existingCategory = await _context.Categories.FirstOrDefaultAsync(c => c.Id == category.CategoryId);
-
-                    // Kiểm tra danh mục có tồn tại không
-                    if (existingCategory == null)
-                    {
-                        // Nếu danh mục không hợp lệ, rollback transaction
-                        await transaction.RollbackAsync();
-
-                        // Xóa sản phẩm đã thêm nếu danh mục không hợp lệ
-                        _context.Products.Remove(product);
-
-                        return new Response<Product>
-                        {
-                            IsSuccess = false,
-                            Message = _appSettings.GetConfigurationValue("ProductMessages", "ProductNotFound"),
-                            HttpStatusCode = HttpStatusCode.BadRequest,
-                        };
-                    }
-
-                    var productCategories = new ProductCategory
-                    {
-                        ProductId = product.Id,
-                        CategoryId = category.CategoryId
-                    };
-                    await _context.ProductCategories.AddAsync(productCategories);
-                }
-            }
 
             await _context.SaveChangesAsync();
 
@@ -263,28 +265,29 @@ public class ProductService : IProduct
                 product.Images = pro.Images;
                 product.ExpiryDate = pro.ExpiryDate;
                 product.UpdatedAt = DateTime.UtcNow;
+                product.CategoryId = pro.CategoryId;
 
                 _context.Products.Update(product);
 
-                var existingCategoryIds = product.ProductCategories.Select(pc => pc.CategoryId).ToList();
+                // var existingCategoryIds = product.ProductCategories.Select(pc => pc.CategoryId).ToList();
 
-                var newCategoryIds = pro.ProductCategories.Select(pc => pc.CategoryId).ToList();
+                // var newCategoryIds = pro.ProductCategories.Select(pc => pc.CategoryId).ToList();
 
-                if (!existingCategoryIds.SequenceEqual(newCategoryIds))
-                {
-                    var existingProductCategories = _context.ProductCategories.Where(pc => pc.ProductId == ProductId).ToList();
-                    _context.ProductCategories.RemoveRange(existingProductCategories);
+                // if (!existingCategoryIds.SequenceEqual(newCategoryIds))
+                // {
+                //     var existingProductCategories = _context.ProductCategories.Where(pc => pc.ProductId == ProductId).ToList();
+                //     _context.ProductCategories.RemoveRange(existingProductCategories);
 
-                    foreach (var categoryId in newCategoryIds)
-                    {
-                        var productCategory = new ProductCategory
-                        {
-                            ProductId = product.Id,
-                            CategoryId = categoryId
-                        };
-                        await _context.ProductCategories.AddAsync(productCategory);
-                    }
-                }
+                //     foreach (var categoryId in newCategoryIds)
+                //     {
+                //         var productCategory = new ProductCategory
+                //         {
+                //             ProductId = product.Id,
+                //             CategoryId = categoryId
+                //         };
+                //         await _context.ProductCategories.AddAsync(productCategory);
+                //     }
+                // }
 
                 await _context.SaveChangesAsync();
 
@@ -429,7 +432,7 @@ public class ProductService : IProduct
             try
             {
                 var products = await _context.Products
-                        .Include(p => p.ProductCategories)
+                        .Include(p => p.Category)
                         .Include(p => p.SubProducts)
                         .Include(p => p.Supplier)
                         .Select(pro => new Product
@@ -444,7 +447,7 @@ public class ProductService : IProduct
                             ExpiryDate = pro.ExpiryDate,
                             CreatedAt = pro.CreatedAt,
                             UpdatedAt = pro.UpdatedAt,
-                            ProductCategories = pro.ProductCategories,
+                            Category = pro.Category,
                             SubProducts = pro.SubProducts
                         })
                         .OrderByDescending(x => x.Id)
@@ -481,7 +484,7 @@ public class ProductService : IProduct
             try
             {
                 var products = await _context.Products
-                        .Include(p => p.ProductCategories)
+                        .Include(p => p.Category)
                         .Include(p => p.SubProducts)
                         .Include(p => p.Supplier)
                         .Select(pro => new Product
@@ -496,7 +499,7 @@ public class ProductService : IProduct
                             ExpiryDate = pro.ExpiryDate,
                             CreatedAt = pro.CreatedAt,
                             UpdatedAt = pro.UpdatedAt,
-                            ProductCategories = pro.ProductCategories,
+                            Category = pro.Category,
                             SubProducts = pro.SubProducts
                         })
                         .OrderByDescending(x => x.Id)
@@ -537,7 +540,7 @@ public class ProductService : IProduct
                 var totalRecords = await _context.Products.CountAsync();
 
                 var products = await _context.Products
-                        .Include(p => p.ProductCategories)
+                        .Include(p => p.Category)
                         .Include(p => p.SubProducts)
                         .Include(p => p.Supplier)
                         .Select(pro => new Product
@@ -552,7 +555,7 @@ public class ProductService : IProduct
                             ExpiryDate = pro.ExpiryDate,
                             CreatedAt = pro.CreatedAt,
                             UpdatedAt = pro.UpdatedAt,
-                            ProductCategories = pro.ProductCategories,
+                            Category = pro.Category,
                             SubProducts = pro.SubProducts
                         })
                         .OrderByDescending(x => x.Id)
@@ -592,7 +595,7 @@ public class ProductService : IProduct
                     };
                 }
                 var product = await _context.Products
-                                    .Include(p => p.ProductCategories)
+                                    .Include(p => p.Category)
                                     .Include(p => p.SubProducts)
                                     .Where(c => c.Id == ProductId)
                                     .Select(pro => new Product
@@ -607,7 +610,7 @@ public class ProductService : IProduct
                                         ExpiryDate = pro.ExpiryDate,
                                         CreatedAt = pro.CreatedAt,
                                         UpdatedAt = pro.UpdatedAt,
-                                        ProductCategories = pro.ProductCategories,
+                                        Category = pro.Category,
                                         SubProducts = pro.SubProducts
                                     })
                                     .OrderByDescending(x => x.Id).FirstOrDefaultAsync();
@@ -708,7 +711,7 @@ public class ProductService : IProduct
                     .Include(sp => sp.Product)
                     .ThenInclude(p => p.SubProducts)
                     .Include(sp => sp.Product)
-                    .ThenInclude(pc => pc.ProductCategories)
+                    .ThenInclude(pc => pc.Category)
                     .AsQueryable();
 
                 // Lọc theo màu sắc
@@ -731,12 +734,12 @@ public class ProductService : IProduct
                     query = query.Where(sp => sp.Price >= minPrice && sp.Price <= maxPrice);
                 }
 
-                // Lọc theo danh mục sản phẩm
-                if (filter.Categories != null && filter.Categories.Any())
-                {
-                    query = query.Where(sp => sp.Product.ProductCategories
-                        .Any(pc => filter.Categories.Contains(pc.CategoryId.ToString())));
-                }
+                // // Lọc theo danh mục sản phẩm
+                // if (filter.Categories != null && filter.Categories.Any())
+                // {
+                //     query = query.Where(sp => sp.Product.ProductCategories
+                //         .Any(pc => filter.Categories.Contains(pc.CategoryId.ToString())));
+                // }
 
                 // Truy vấn các sản phẩm đã được lọc
                 var products = await query.Select(sp => sp.Product).Distinct().ToListAsync();

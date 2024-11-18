@@ -20,16 +20,14 @@ public class AccountService : IAccount
     private readonly UserManager<User> _userManager;
     private readonly RoleManager<IdentityRole> _roleManager;
     private readonly IConfiguration _configuration;
-    private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly EFDataContext _context;
     private readonly TokenValidationParameters _tokenValidationParameters;
     private readonly ILogger<AccountService> _logger;
-    public AccountService(UserManager<User> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, EFDataContext context, TokenValidationParameters tokenValidationParameters, ILogger<AccountService> logger)
+    public AccountService(UserManager<User> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration, EFDataContext context, TokenValidationParameters tokenValidationParameters, ILogger<AccountService> logger)
     {
         _userManager = userManager;
         _roleManager = roleManager;
         _configuration = configuration;
-        _httpContextAccessor = httpContextAccessor;
         _context = context;
         _tokenValidationParameters = tokenValidationParameters;
         _logger = logger;
@@ -45,7 +43,7 @@ public class AccountService : IAccount
             {
                 IsSuccess = false,
                 Message = "User with this email already exists.",
-                HttpStatusCode = HttpStatusCode.BadRequest,
+                HttpStatusCode = HttpStatusCode.Unauthorized,
             };
         }
 
@@ -56,7 +54,7 @@ public class AccountService : IAccount
             {
                 IsSuccess = false,
                 Message = "User with this user already exists.",
-                HttpStatusCode = HttpStatusCode.BadRequest,
+                HttpStatusCode = HttpStatusCode.Unauthorized,
             };
         }
 
@@ -75,7 +73,7 @@ public class AccountService : IAccount
             {
                 IsSuccess = false,
                 Message = $"Registration failed: {errors}.",
-                HttpStatusCode = HttpStatusCode.BadRequest,
+                HttpStatusCode = HttpStatusCode.Unauthorized,
             };
         }
 
@@ -114,7 +112,7 @@ public class AccountService : IAccount
             {
                 IsSuccess = false,
                 Message = "User not found with this email",
-                HttpStatusCode = HttpStatusCode.BadRequest,
+                HttpStatusCode = HttpStatusCode.Unauthorized,
             };
         }
 
@@ -126,7 +124,7 @@ public class AccountService : IAccount
             {
                 IsSuccess = false,
                 Message = "Invalid Password.",
-                HttpStatusCode = HttpStatusCode.BadRequest,
+                HttpStatusCode = HttpStatusCode.Unauthorized,
             };
         }
 
@@ -148,11 +146,11 @@ public class AccountService : IAccount
 
         if (result == null)
         {
-            return new BadRequestObjectResult(new
+            return new UnauthorizedObjectResult(new
             {
                 IsSuccess = false,
                 Message = "Invalid token",
-                HttpStatusCode = HttpStatusCode.BadRequest
+                HttpStatusCode = HttpStatusCode.Unauthorized
             });
         }
 
@@ -261,11 +259,11 @@ public class AccountService : IAccount
             var expClaim = tokenInVerification.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Exp);
             if (expClaim == null || string.IsNullOrEmpty(expClaim.Value))
             {
-                return new BadRequestObjectResult(new
+                return new UnauthorizedObjectResult(new
                 {
                     IsSuccess = false,
                     Message = "Token does not contain an expiry date",
-                    HttpStatusCode = HttpStatusCode.BadRequest
+                    HttpStatusCode = HttpStatusCode.Unauthorized
                 });
             }
 
@@ -275,11 +273,11 @@ public class AccountService : IAccount
 
             if (expiryDate < DateTime.UtcNow)
             {
-                return new BadRequestObjectResult(new
+                return new UnauthorizedObjectResult(new
                 {
                     IsSuccess = false,
                     Message = "Token has not yet expired",
-                    HttpStatusCode = HttpStatusCode.BadRequest
+                    HttpStatusCode = HttpStatusCode.Unauthorized
                 });
             }
 
@@ -288,33 +286,33 @@ public class AccountService : IAccount
 
             if (storedToken == null)
             {
-                return new BadRequestObjectResult(new
+                return new UnauthorizedObjectResult(new
                 {
                     IsSuccess = false,
                     Message = "Token do not exist",
-                    HttpStatusCode = HttpStatusCode.BadRequest
+                    HttpStatusCode = HttpStatusCode.Unauthorized
                 });
             }
 
             // Validation 5 - validate if used
             if (storedToken.IsUesd)
             {
-                return new BadRequestObjectResult(new
+                return new UnauthorizedObjectResult(new
                 {
                     IsSuccess = false,
                     Message = "Token has been used",
-                    HttpStatusCode = HttpStatusCode.BadRequest
+                    HttpStatusCode = HttpStatusCode.Unauthorized
                 });
             }
 
             // Validation 6 - validate if revoked
             if (storedToken.IsRevorked)
             {
-                return new BadRequestObjectResult(new
+                return new UnauthorizedObjectResult(new
                 {
                     IsSuccess = false,
                     Message = "Token has been revoked",
-                    HttpStatusCode = HttpStatusCode.BadRequest
+                    HttpStatusCode = HttpStatusCode.Unauthorized
                 });
             }
 
@@ -323,11 +321,11 @@ public class AccountService : IAccount
             var jtiClaim = tokenInVerification.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Jti);
             if (jtiClaim == null || string.IsNullOrEmpty(jtiClaim.Value))
             {
-                return new BadRequestObjectResult(new
+                return new UnauthorizedObjectResult(new
                 {
                     IsSuccess = false,
                     Message = "Token does not contain a JTI",
-                    HttpStatusCode = HttpStatusCode.BadRequest
+                    HttpStatusCode = HttpStatusCode.Unauthorized
                 });
             }
 
@@ -335,11 +333,11 @@ public class AccountService : IAccount
 
             if (storedToken.JwtId != jti)
             {
-                return new BadRequestObjectResult(new
+                return new UnauthorizedObjectResult(new
                 {
                     IsSuccess = false,
                     Message = "Token doesn't match",
-                    HttpStatusCode = HttpStatusCode.BadRequest
+                    HttpStatusCode = HttpStatusCode.Unauthorized
                 });
             }
 

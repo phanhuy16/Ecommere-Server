@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
 namespace Server.Entities;
@@ -18,8 +19,10 @@ public class Supplier
     public string? Image { get; set; } = string.Empty;
     public DateTime? CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
+    public Guid CategoryId { get; set; }
+    [JsonIgnore]
+    public Category? Category { get; set; } = null!;
 
-    public virtual List<SupplierCategory> SupplierCategory { get; set; } = new List<SupplierCategory>();
     [JsonIgnore]
     public ICollection<Product> Products { get; set; } = new List<Product>();
 }

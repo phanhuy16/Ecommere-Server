@@ -17,8 +17,6 @@ public partial class EFDataContext : IdentityDbContext<User>
     public virtual DbSet<Supplier> Suppliers { get; set; } = null!;
     public virtual DbSet<Promotion> Promotions { get; set; } = null!;
     public virtual DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
-    public virtual DbSet<ProductCategory> ProductCategories { get; set; } = null!;
-    public virtual DbSet<SupplierCategory> SupplierCategories { get; set; } = null!;
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -39,10 +37,6 @@ public partial class EFDataContext : IdentityDbContext<User>
         modelBuilder.Entity<IdentityRole>().HasData(user);
         modelBuilder.Entity<IdentityRole>().HasData(admin);
 
-        modelBuilder.Entity<ProductCategory>().HasKey(sc => new { sc.ProductId, sc.CategoryId });
-
-        modelBuilder.Entity<SupplierCategory>().HasKey(sc => new { sc.SupplierId, sc.CategoryId });
-
         // Cart
         modelBuilder.Entity<Cart>(entity =>
         {
@@ -59,6 +53,35 @@ public partial class EFDataContext : IdentityDbContext<User>
                 .HasForeignKey(c => c.ProductId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+        });
+
+        // Product
+        modelBuilder.Entity<Product>(entity =>
+        {
+            entity.ToTable("products");
+            entity.HasKey(p => p.Id);
+
+            entity.HasOne(p => p.Supplier)
+                .WithMany(p => p.Products)
+                .HasForeignKey(p => p.SupplierId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(p => p.Category)
+                .WithMany(p => p.Products)
+                .HasForeignKey(p => p.CategoryId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // Supplier
+        modelBuilder.Entity<Supplier>(entity =>
+        {
+            entity.ToTable("suppliers");
+            entity.HasKey(p => p.Id);
+
+            entity.HasOne(p => p.Category)
+                .WithMany(p => p.Suppliers)
+                .HasForeignKey(p => p.CategoryId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
 
         base.OnModelCreating(modelBuilder);

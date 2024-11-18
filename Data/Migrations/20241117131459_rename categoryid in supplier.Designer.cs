@@ -12,8 +12,8 @@ using Server.Data;
 namespace Server.Data.Migrations
 {
     [DbContext(typeof(EFDataContext))]
-    [Migration("20241115114749_allow null in suppliercategory supplierid and categoryid")]
-    partial class allownullinsuppliercategorysupplieridandcategoryid
+    [Migration("20241117131459_rename categoryid in supplier")]
+    partial class renamecategoryidinsupplier
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -54,13 +54,13 @@ namespace Server.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "3487cf9a-e3e8-486e-aef8-601f72bd78b6",
+                            Id = "69c76fa2-e509-4010-9a24-404edf174236",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
-                            Id = "3f029815-10ca-438f-9eae-8ec9030e64cc",
+                            Id = "03456a3d-0ea8-46a1-8caf-00ef2820910a",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         });
@@ -277,6 +277,9 @@ namespace Server.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Content")
                         .HasColumnType("nvarchar(max)");
 
@@ -309,24 +312,11 @@ namespace Server.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("SupplierId");
-
-                    b.ToTable("Products");
-                });
-
-            modelBuilder.Entity("Server.Entities.ProductCategory", b =>
-                {
-                    b.Property<Guid>("ProductId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("CategoryId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("ProductId", "CategoryId");
-
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("ProductCategories");
+                    b.HasIndex("SupplierId");
+
+                    b.ToTable("products", (string)null);
                 });
 
             modelBuilder.Entity("Server.Entities.Promotion", b =>
@@ -467,6 +457,9 @@ namespace Server.Data.Migrations
                     b.Property<int>("Active")
                         .HasColumnType("int");
 
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Contact")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -503,22 +496,9 @@ namespace Server.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Suppliers");
-                });
-
-            modelBuilder.Entity("Server.Entities.SupplierCategory", b =>
-                {
-                    b.Property<Guid?>("SupplierId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("CategoryId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("SupplierId", "CategoryId");
-
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("SupplierCategories");
+                    b.ToTable("suppliers", (string)null);
                 });
 
             modelBuilder.Entity("Server.Entities.User", b =>
@@ -658,32 +638,21 @@ namespace Server.Data.Migrations
 
             modelBuilder.Entity("Server.Entities.Product", b =>
                 {
+                    b.HasOne("Server.Entities.Category", "Category")
+                        .WithMany("Products")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("Server.Entities.Supplier", "Supplier")
                         .WithMany("Products")
                         .HasForeignKey("SupplierId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Supplier");
-                });
-
-            modelBuilder.Entity("Server.Entities.ProductCategory", b =>
-                {
-                    b.HasOne("Server.Entities.Category", "Category")
-                        .WithMany("ProductCategories")
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Server.Entities.Product", "Product")
-                        .WithMany("ProductCategories")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Category");
 
-                    b.Navigation("Product");
+                    b.Navigation("Supplier");
                 });
 
             modelBuilder.Entity("Server.Entities.RefreshToken", b =>
@@ -714,30 +683,22 @@ namespace Server.Data.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("Server.Entities.SupplierCategory", b =>
+            modelBuilder.Entity("Server.Entities.Supplier", b =>
                 {
                     b.HasOne("Server.Entities.Category", "Category")
-                        .WithMany("SupplierCategories")
+                        .WithMany("Suppliers")
                         .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Server.Entities.Supplier", "Supplier")
-                        .WithMany("SupplierCategory")
-                        .HasForeignKey("SupplierId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Category");
-
-                    b.Navigation("Supplier");
                 });
 
             modelBuilder.Entity("Server.Entities.Category", b =>
                 {
-                    b.Navigation("ProductCategories");
+                    b.Navigation("Products");
 
-                    b.Navigation("SupplierCategories");
+                    b.Navigation("Suppliers");
                 });
 
             modelBuilder.Entity("Server.Entities.Order", b =>
@@ -748,8 +709,6 @@ namespace Server.Data.Migrations
             modelBuilder.Entity("Server.Entities.Product", b =>
                 {
                     b.Navigation("Carts");
-
-                    b.Navigation("ProductCategories");
 
                     b.Navigation("SubProducts");
                 });
@@ -762,8 +721,6 @@ namespace Server.Data.Migrations
             modelBuilder.Entity("Server.Entities.Supplier", b =>
                 {
                     b.Navigation("Products");
-
-                    b.Navigation("SupplierCategory");
                 });
 #pragma warning restore 612, 618
         }

@@ -9,7 +9,7 @@ using Server.Utilities.Response;
 
 namespace Server.Controllers;
 
-[Authorize(Roles = "Admin")]
+// [Authorize(Roles = "Admin")]
 
 [ApiController]
 [Route("api/[controller]")]
@@ -20,8 +20,6 @@ public class CategoriesController : ControllerBase
     {
         _categoryService = categoryService;
     }
-
-    // [Authorize(Roles = "User")]
 
     [HttpGet, Route("get-all")]
     [ProducesResponseType(typeof(List<Category>), (int)HttpStatusCode.OK)]

@@ -83,7 +83,7 @@ var tokenValidationParams = new TokenValidationParameters
 {
     ValidateIssuer = true,
     ValidateAudience = true,
-    ValidateLifetime = false,
+    ValidateLifetime = true,
     ValidateIssuerSigningKey = true,
     ValidIssuer = Jwt["Issuer"],
     ValidAudience = Jwt["Audience"],

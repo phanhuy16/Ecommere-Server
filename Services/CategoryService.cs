@@ -29,7 +29,8 @@ public class CategoryService : ICategory
             try
             {
                 var categories = await _context.Categories
-                    .Include(c => c.SupplierCategories)
+                    .Include(c => c.Suppliers)
+                    .Include(p => p.Products)
                     .Select(cate => new Category
                     {
                         Id = cate.Id,
@@ -39,7 +40,8 @@ public class CategoryService : ICategory
                         Description = cate.Description,
                         CreatedAt = cate.CreatedAt,
                         UpdatedAt = cate.UpdatedAt,
-                        SupplierCategories = cate.SupplierCategories
+                        Suppliers = cate.Suppliers,
+                        Products = cate.Products
                     })
                     .OrderByDescending(x => x.Id)
                     .ToListAsync();
@@ -78,7 +80,8 @@ public class CategoryService : ICategory
                 var totalRecords = await _context.Categories.CountAsync();
 
                 var categories = await _context.Categories
-                    .Include(c => c.SupplierCategories)
+                    .Include(c => c.Suppliers)
+                    .Include(p => p.Products)
                     .Select(cate => new Category
                     {
                         Id = cate.Id,
@@ -88,7 +91,8 @@ public class CategoryService : ICategory
                         Description = cate.Description,
                         CreatedAt = cate.CreatedAt,
                         UpdatedAt = cate.UpdatedAt,
-                        SupplierCategories = cate.SupplierCategories
+                        Suppliers = cate.Suppliers,
+                        Products = cate.Products,
                     })
                     .OrderByDescending(x => x.Id)
                     .Skip((validFilter.PageNumber - 1) * validFilter.PageSize)
@@ -127,7 +131,8 @@ public class CategoryService : ICategory
                     };
                 }
                 var categories = await _context.Categories
-                    .Include(c => c.SupplierCategories)
+                    .Include(c => c.Suppliers)
+                    .Include(p => p.Products)
                     .Where(c => c.Id == CategoryId)
                     .Select(cate => new Category
                     {
@@ -138,7 +143,8 @@ public class CategoryService : ICategory
                         Description = cate.Description,
                         CreatedAt = cate.CreatedAt,
                         UpdatedAt = cate.UpdatedAt,
-                        SupplierCategories = cate.SupplierCategories
+                        Suppliers = cate.Suppliers,
+                        Products = cate.Products,
                     })
                     .OrderByDescending(x => x.Id)
                     .FirstOrDefaultAsync();

@@ -1,5 +1,6 @@
 
 
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
 namespace Server.Entities;
@@ -20,9 +21,9 @@ public class Product
     public Guid SupplierId { get; set; }
     [JsonIgnore]
     public Supplier? Supplier { get; set; } = null!;
-
+    public Guid CategoryId { get; set; }
     [JsonIgnore]
-    public virtual ICollection<ProductCategory> ProductCategories { get; set; } = new List<ProductCategory>();
+    public virtual Category? Category { get; set; } = null!;
     [JsonIgnore]
     public virtual ICollection<SubProduct> SubProducts { get; set; } = new List<SubProduct>();
     [JsonIgnore]
