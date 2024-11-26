@@ -179,7 +179,7 @@ public class AccountService : IAccount
         var refreshToken = new RefreshToken()
         {
             JwtId = token.Id,
-            IsUesd = false,
+            IsUsed = false,
             IsRevorked = false,
             UserId = user.Id,
             AddedDate = DateTime.UtcNow,
@@ -271,7 +271,7 @@ public class AccountService : IAccount
 
             var expiryDate = UnixTimeStampToDateTime(utcExpiryDate);
 
-            if (expiryDate < DateTime.UtcNow)
+            if (expiryDate > DateTime.UtcNow)
             {
                 return new UnauthorizedObjectResult(new
                 {
@@ -284,7 +284,7 @@ public class AccountService : IAccount
             // Validation 4 - validate existence of the token 
             var storedToken = await _context.RefreshTokens.FirstOrDefaultAsync(x => x.Token == tokenRequest.RefreshToken);
 
-            if (storedToken == null)
+            if (storedToken == null || storedToken.IsRevorked || storedToken.IsUsed)
             {
                 return new UnauthorizedObjectResult(new
                 {
@@ -295,7 +295,7 @@ public class AccountService : IAccount
             }
 
             // Validation 5 - validate if used
-            if (storedToken.IsUesd)
+            if (storedToken.IsUsed)
             {
                 return new UnauthorizedObjectResult(new
                 {
@@ -343,7 +343,7 @@ public class AccountService : IAccount
 
             // Update current token
 
-            storedToken.IsUesd = true;
+            storedToken.IsUsed = true;
             _context.RefreshTokens.Update(storedToken);
             await _context.SaveChangesAsync();
 
@@ -368,7 +368,7 @@ public class AccountService : IAccount
     private string RandomString(int length)
     {
         var random = new Random();
-        var chars = "ABCDEFGHIJKLMNOPQRSTUVWYZ0123456789";
+        var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         return new string(Enumerable.Repeat(chars, length)
             .Select(x => x[random.Next(x.Length)]).ToArray());
     }

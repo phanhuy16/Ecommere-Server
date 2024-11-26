@@ -9,7 +9,7 @@ using Server.Utilities.Response;
 namespace Server.Controllers
 {
 
-    // [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin")]
 
     [ApiController]
     [Route("api/[controller]")]

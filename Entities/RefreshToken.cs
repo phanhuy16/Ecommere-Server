@@ -9,7 +9,7 @@ public class RefreshToken
     public string UserId { get; set; } = null!;
     public string Token { get; set; } = null!;
     public string JwtId { get; set; } = null!;
-    public bool IsUesd { get; set; }
+    public bool IsUsed { get; set; }
     public bool IsRevorked { get; set; }
     public DateTime AddedDate { get; set; }
     public DateTime ExpiryDate { get; set; }

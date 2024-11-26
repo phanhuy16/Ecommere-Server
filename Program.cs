@@ -11,6 +11,8 @@ using Server.Helper;
 using Server.Data;
 using Server.Entities;
 using Server.Utilities.Pagination;
+using Microsoft.IdentityModel.Logging;
+
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -39,11 +41,17 @@ builder.Services.AddDbContext<EFDataContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("HRConnectString"))
 );
 
-builder.Services.AddAuthorization(options =>
+// builder.Services.AddAuthorization(options =>
+// {
+//     options.AddPolicy("DepartmentPolicy",
+//     policy => policy.RequireClaim("department"));
+// });
+
+if (builder.Environment.IsDevelopment())
 {
-    // options.AddPolicy("DepartmentPolicy",
-    // policy => policy.RequireClaim("department"));
-});
+    IdentityModelEventSource.LogCompleteSecurityArtifact = true;
+}
+
 
 // Configure Identity and Authentication
 builder.Services.AddIdentity<User, IdentityRole>()
@@ -79,19 +87,30 @@ builder.Services.AddIdentityCore<User>(options =>
 
 }).AddEntityFrameworkStores<EFDataContext>().AddDefaultTokenProviders();
 
+var key = Encoding.UTF8.GetBytes(Jwt.GetSection("SecurityKey").Value!);
+
 var tokenValidationParams = new TokenValidationParameters
 {
     ValidateIssuer = true,
     ValidateAudience = true,
     ValidateLifetime = true,
+    RequireExpirationTime = true,
     ValidateIssuerSigningKey = true,
     ValidIssuer = Jwt["Issuer"],
     ValidAudience = Jwt["Audience"],
-    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Jwt.GetSection("SecurityKey").Value!)),
-    ClockSkew = TimeSpan.Zero
+    IssuerSigningKey = new SymmetricSecurityKey(key),
+    // ClockSkew = TimeSpan.Zero
+    ClockSkew = TimeSpan.FromMinutes(5),
 };
 
 builder.Services.AddSingleton(tokenValidationParams);
+
+var jwtSection = builder.Configuration.GetSection("Jwt");
+if (!jwtSection.Exists())
+{
+    throw new Exception("Jwt section is missing in appsettings.json");
+}
+
 
 builder.Services.AddAuthentication(options =>
 {
